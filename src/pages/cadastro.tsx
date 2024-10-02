@@ -18,7 +18,40 @@ import { BgCard } from "@/components/bg-card";
 import { supabase } from "@/supabaseClient"; // Importe o cliente Supabase
 
 export default function CadastroPage() {
-  const [pacData, setPacData] = useState({
+  type PacDataKey = keyof typeof pacData;
+  type PacFieldKeys = keyof PacData; // Isso dará um tipo que é a união das chaves de PacData.
+  type PacField = {
+    value: string;
+    required: boolean;
+  };
+
+  type PacData = {
+    pac_name: PacField;
+    pac_sex: PacField;
+    pac_whatsapp: PacField;
+    pac_cpf: PacField;
+    pac_birth_date: PacField;
+    pac_addrs_zip: PacField;
+    pac_addrs_street_name: PacField;
+    pac_addrs_num: PacField;
+    pac_addrs_has_comp: {
+      value: boolean;
+      required: boolean;
+    };
+    pac_addrs_comp: PacField;
+    pac_has_resp: {
+      value: boolean;
+      required: boolean;
+    };
+    pac_resp_name: PacField;
+    pac_resp_email: PacField;
+    pac_resp_whatsapp: PacField;
+    pac_resp_education: PacField;
+    pac_resp_ocupation: PacField;
+    // Adicione outros campos conforme necessário
+  };
+
+  const [pacData, setPacData] = useState<PacData>({
     pac_name: { value: "", required: true },
     pac_sex: { value: "Masculino", required: true },
     pac_whatsapp: { value: "", required: true },
@@ -27,9 +60,9 @@ export default function CadastroPage() {
     pac_addrs_street_name: { value: "", required: true },
     pac_addrs_num: { value: "", required: true },
     pac_addrs_zip: { value: "", required: true },
-    pac_addrs_has_comp: { value: true, required: true },
+    pac_addrs_has_comp: { value: true, required: false },
     pac_addrs_comp: { value: "", required: true },
-    pac_has_resp: { value: true, required: true },
+    pac_has_resp: { value: true, required: false },
     pac_resp_name: { value: "", required: true },
     pac_resp_email: { value: "", required: true },
     pac_resp_whatsapp: { value: "", required: true },
@@ -44,24 +77,32 @@ export default function CadastroPage() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target as { name: PacFieldKeys; value: string };
 
-    if (name === "pac_addrs_zip") {
-      const formattedZip = formatZipCode(value);
-      setIsZipCodeInvalid(!isValidZipCode(formattedZip));
+    // Verifica se o nome do campo é uma chave válida
+    if (name in pacData) {
+      let formattedValue = value;
+
+      // Formatação do CEP
+      if (name === "pac_addrs_zip") {
+        formattedValue = formatZipCode(value);
+        setIsZipCodeInvalid(!isValidZipCode(formattedValue));
+      }
+
+      // Atualize o estado com o valor formatado
+      setPacData((prevData) => ({
+        ...prevData,
+        [name]: {
+          value:
+            name === "pac_cpf"
+              ? formatCPF(formattedValue)
+              : name === "pac_whatsapp" || name === "pac_resp_whatsapp"
+                ? formatPhone(formattedValue)
+                : formattedValue,
+          required: prevData[name].required, // Mantém o valor de required inalterado
+        },
+      }));
     }
-
-    setPacData((prevData) => ({
-      ...prevData,
-      [name]:
-        name === "pac_cpf"
-          ? formatCPF(value)
-          : name === "pac_whatsapp" || name === "pac_resp_whatsapp"
-            ? formatPhone(value)
-            : name === "pac_addrs_zip"
-              ? formatZipCode(value)
-              : value,
-    }));
   };
 
   const handleDateChange = (value: DateValue | null) => {
@@ -108,18 +149,86 @@ export default function CadastroPage() {
     }
     return true;
   };
+
+  // Lista de campos obrigatórios (use as chaves do objeto pacData)
+  const requiredFields = [
+    "pac_name",
+    "pac_sex",
+    "pac_whatsapp",
+    "pac_cpf",
+    "pac_birth_date",
+    "pac_addrs_street_name",
+    "pac_addrs_num",
+    "pac_addrs_zip",
+    "pac_addrs_comp",
+    "pac_resp_name",
+    "pac_resp_email",
+    "pac_resp_whatsapp",
+    "pac_resp_education",
+    "pac_resp_ocupation",
+  ];
+  const missingFields = requiredFields.filter((field) => {
+    // Se pac_addrs_comp deve ser preenchido apenas se pac_addrs_has_comp é verdadeiro
+    if (field === "pac_addrs_comp") {
+      return pacData.pac_addrs_has_comp.value && !pacData.pac_addrs_comp.value;
+    }
+
+    // Verifica se algum dos campos de responsável é obrigatório
+    if (
+      field === "pac_resp_name" ||
+      field === "pac_resp_email" ||
+      field === "pac_resp_whatsapp" ||
+      field === "pac_resp_education" ||
+      field === "pac_resp_ocupation"
+    ) {
+      return pacData.pac_has_resp.value && !pacData[field].value;
+    }
+
+    // Para os outros campos obrigatórios
+    return !pacData[field].value;
+  });
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Verifica se algum campo obrigatório está vazio
+
+    if (missingFields.length > 0) {
+      alert(
+        `Os seguintes campos são obrigatórios: ${missingFields.join(", ")}`
+      );
+      return;
+    }
+
+    // Verifica se CPF é válido
     if (!isValidCPF(pacData.pac_cpf.value)) {
       alert("CPF inválido!");
       return;
     }
+
+    // Verifica se CEP é inválido
     if (isZipCodeInvalid) {
       alert("CEP inválido!");
       return;
     }
 
+    // Verifica se o WhatsApp é válido
+    if (!isValidPhone(pacData.pac_whatsapp.value)) {
+      alert("Número de WhatsApp inválido!");
+      return;
+    }
+
+    // Verifica se telefone do responsável (caso tenha) é válido
+    if (
+      pacData.pac_has_resp &&
+      pacData.pac_resp_whatsapp &&
+      !isValidPhone(pacData.pac_resp_whatsapp.value)
+    ) {
+      alert("Número de WhatsApp do responsável inválido!");
+      return;
+    }
+
+    // Tenta enviar os dados para o Supabase
     try {
       const { data, error } = await supabase
         .from("pacientes")
@@ -130,13 +239,12 @@ export default function CadastroPage() {
       alert("Cadastro realizado com sucesso!");
     } catch (error) {
       if (error instanceof Error) {
-        alert("Erro ao enviar os dados, tente novamente.");
+        alert(`Erro ao enviar os dados: ${error.message}`);
       } else {
         alert("Erro desconhecido, tente novamente.");
       }
     }
   };
-
   const isInvalidPhone = useMemo(() => {
     const { pac_whatsapp, pac_resp_whatsapp } = pacData;
 
@@ -364,7 +472,12 @@ export default function CadastroPage() {
           </BgCard>
           <Spacer />
           <div className="flex">
-            <Button className="mx-auto" color="primary" type="submit">
+            <Button
+              className="mx-auto"
+              color="primary"
+              type="submit"
+              isDisabled={missingFields.length > 0 ? false : true} // Desabilita se houver campos obrigatórios vazios
+            >
               Enviar
             </Button>
           </div>
