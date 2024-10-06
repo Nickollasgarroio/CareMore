@@ -6,7 +6,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   return (
-    <NextUIProvider navigate={navigate} locale="pt-BR">
+    <NextUIProvider locale="pt-BR" navigate={navigate}>
       <NextThemesProvider>{children}</NextThemesProvider>
     </NextUIProvider>
   );

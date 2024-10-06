@@ -2,6 +2,7 @@ import { ThemeProvider } from "next-themes";
 import { Route, Routes } from "react-router-dom";
 
 import IndexPage from "@/pages/index";
+import ProntuariosPage from "@/pages/prontuarios";
 import DocsPage from "@/pages/docs";
 import PricingPage from "@/pages/pricing";
 import BlogPage from "@/pages/blog";
@@ -18,6 +19,7 @@ function App() {
         <Route element={<BlogPage />} path="/blog" />
         <Route element={<AboutPage />} path="/about" />
         <Route element={<CadastroPage />} path="/cadastro" />
+        <Route element={<ProntuariosPage />} path="/prontuarios" />
       </Routes>
     </ThemeProvider>
   );

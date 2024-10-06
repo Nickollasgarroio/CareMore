@@ -12,6 +12,7 @@ export const siteConfig = {
       label: "Cadastro",
       href: "/cadastro",
     },
+    { label: "Prontuários", href: "/prontuarios" },
     {
       label: "Pricing",
       href: "/pricing",
@@ -31,8 +32,8 @@ export const siteConfig = {
       href: "/profile",
     },
     {
-      label: "Dashboard",
-      href: "/dashboard",
+      label: "Cadastro",
+      href: "/cadastro",
     },
     {
       label: "Projects",

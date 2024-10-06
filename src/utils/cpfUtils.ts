@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
+
 // Função para formatar o CPF no padrão XXX.XXX.XXX-XX
 export const formatCPF = (value: string): string => {
   const cleanValue = value.replace(/\D/g, "").slice(0, 11); // Limita a 11 dígitos
-
   return cleanValue.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 };
+
 // Função para validar o CPF
 export const isValidCPF = (cpf: string): boolean => {
   cpf = cpf.replace(/\D/g, "");
