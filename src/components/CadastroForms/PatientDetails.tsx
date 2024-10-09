@@ -1,18 +1,37 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Spacer, Checkbox, Button } from "@nextui-org/react";
 
 import InputField from "@/components/CadastroForms/InputField";
 import SelectField from "@/components/CadastroForms/SelectField";
 import DatePicker from "@/components/CadastroForms/DatePicker";
 import { usePacForm } from "@/providers/PacFormContext"; // Usando o hook customizado
+import { PacData } from "@/types/pacDataTypes"; // Altere o caminho
 
 export const PatientDetails = () => {
   const [showTeste, setShowTeste] = useState(false);
 
+  const [pacDataState, setPacDataState] = useState<PacData>({
+    pac_name: { value: "", required: true },
+    pac_sex: { value: "", required: true },
+    pac_whatsapp: { value: "", required: true },
+    pac_cpf: { value: "", required: true },
+    pac_birth_date: { value: "", required: true },
+    pac_email: { value: "", required: true },
+    pac_addrs_street_name: { value: "", required: true },
+    pac_addrs_num: { value: "", required: true },
+    pac_addrs_zip: { value: "", required: true },
+    pac_addrs_has_comp: { value: true, required: true },
+    pac_addrs_comp: { value: "", required: true },
+    pac_has_resp: { value: true, required: false },
+    pac_resp_name: { value: "", required: true },
+    pac_resp_email: { value: "", required: true },
+    pac_resp_whatsapp: { value: "", required: true },
+    pac_resp_education: { value: "", required: true },
+    pac_resp_ocupation: { value: "", required: true },
+  });
+
   const {
-    pacDataState,
     handleChange,
-    setPacDataState,
     handleCPFChange,
     handleDateChange,
     isInvalidPhone,
@@ -26,8 +45,6 @@ export const PatientDetails = () => {
       <div>
         <div className="flex flex-col gap-4">
           <InputField
-            errorMessage={formErrors.pac_name}
-            isInvalid={Boolean(formErrors.pac_name)}
             isRequired={pacDataState.pac_name.required}
             label="Nome Completo"
             labelPlacement="outside"
@@ -60,7 +77,6 @@ export const PatientDetails = () => {
             isRequired={pacDataState.pac_whatsapp.required}
             label="Telefone"
             labelPlacement="outside"
-            mask="+55 (99) 99999-9999"
             name="pac_whatsapp"
             placeholder="Telefone"
             value={pacDataState.pac_whatsapp.value}
@@ -87,7 +103,6 @@ export const PatientDetails = () => {
             isRequired={pacDataState.pac_cpf.required}
             label="CPF"
             labelPlacement="outside"
-            mask="999.999.999-99"
             name="pac_cpf"
             placeholder="CPF"
             value={pacDataState.pac_cpf.value}
@@ -113,7 +128,6 @@ export const PatientDetails = () => {
             isRequired={pacDataState.pac_addrs_zip.required}
             label="CEP"
             labelPlacement="outside"
-            mask="99999-999"
             name="pac_addrs_zip"
             placeholder="CEP"
             value={pacDataState.pac_addrs_zip.value}

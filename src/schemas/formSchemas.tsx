@@ -3,21 +3,19 @@ import { z } from "zod";
 import { isValidCPF } from "@/utils/cpfUtils";
 import { isValidPhone } from "@/utils/phoneUtils";
 import { isValidZipCode } from "@/utils/zipUtils";
+import { newDate } from "react-datepicker/dist/date_utils";
+import { today } from "@internationalized/date";
 
 export const cadastroSchema = z.object({
-  pac_name: z.string().min(1, { message: "Nome é obrigatório" }),
+  pac_name: z.string().min(3, { message: "Nome é obrigatório" }),
   pac_sex: z.enum(["Masculino", "Feminino", "Não Binário"], {
     errorMap: () => ({ message: "Sexo é obrigatório" }),
   }),
-  pac_whatsapp: z.string().refine(isValidPhone, {
-    message: "Número de WhatsApp inválido",
-  }),
-  pac_cpf: z.string().refine(isValidCPF, {
-    message: "CPF inválido",
-  }),
-  pac_birth_date: z
-    .string()
-    .min(1, { message: "Data de nascimento é obrigatória" }),
+  pac_whatsapp: z.string(),
+  pac_cpf: z.string(),
+  
+  pac_birth_date: z.string(),
+  
   pac_addrs_street_name: z
     .string()
     .min(1, { message: "Endereço é obrigatório" }),

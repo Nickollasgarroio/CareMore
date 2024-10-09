@@ -136,7 +136,7 @@ export default function usePacFormState() {
   });
 
   // Função de submissão do formulário
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const preparedData = requiredFields.reduce(
       (acc, key) => {
@@ -189,7 +189,7 @@ export default function usePacFormState() {
     isInvalidCPF,
     formErrors,
     isZipCodeInvalid,
-    handleSubmit,
+    submitHandler,
     missingFields,
   };
 }

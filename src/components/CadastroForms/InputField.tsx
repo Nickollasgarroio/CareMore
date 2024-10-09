@@ -1,7 +1,9 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
 import { Input } from "@nextui-org/react";
-import InputMask from "react-input-mask";
+
+import {cadastroSchema} from '@/schemas/formSchemas'
+
 
 export default function InputField({
   label,
@@ -12,12 +14,12 @@ export default function InputField({
   placeholder,
   value,
   onChange,
-  errorMessage,
-  isInvalid,
   isRequired,
   maxLength,
+  isInvalid,
+  errorMessage,
   type,
-  mask,
+
 }: {
   color?:
     | "primary"
@@ -36,32 +38,17 @@ export default function InputField({
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   errorMessage?: string;
-  isInvalid?: boolean;
-  isRequired?: boolean;
+  isInvalid: boolean;
+  isRequired: boolean;
   maxLength?: number;
   type?: string;
-  mask?: string;
+
 }) {
-  return mask ? (
-    // Se houver uma máscara, renderize o InputMask
-    <InputMask mask={mask} value={value} onChange={onChange}>
-      {/* Renderize o componente Input diretamente como filho do InputMask */}
-      <Input
-        className={className}
-        color={color}
-        errorMessage={errorMessage}
-        isInvalid={isInvalid}
-        isRequired={isRequired}
-        label={label}
-        labelPlacement={labelPlacement}
-        maxLength={maxLength}
-        name={name}
-        placeholder={placeholder}
-        type={type}
-      />
-    </InputMask>
-  ) : (
-    // Caso não tenha máscara, renderize o Input padrão
+  const valueMasked = (value: string) => {
+  }
+  return (
+    
+
     <Input
       className={className}
       color={color}
@@ -73,9 +60,10 @@ export default function InputField({
       maxLength={maxLength}
       name={name}
       placeholder={placeholder}
-      value={value}
       type={type}
-      onChange={onChange}
+      value={value}
+        onChange={onChange}
+
     />
   );
 }
