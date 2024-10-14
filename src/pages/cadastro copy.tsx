@@ -12,10 +12,11 @@ import { Input } from "@nextui-org/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
 import { DateValue } from "@internationalized/date";
-import { useHookFormMask, useInputMask } from "use-mask-input";
+import { useHookFormMask } from "use-mask-input";
 
 import { BgCard } from "@/components/bg-card";
 import DefaultLayout from "@/layouts/default";
+import { useCEPFinder } from "@/hooks/useCEPFinder";
 
 export default function CadastroPage() {
   type FormData = {
@@ -94,15 +95,9 @@ export default function CadastroPage() {
   });
 
   const registerWithMask = useHookFormMask(register);
-  const formatCEP = (e: string) => {
-    const CEP = e.replace(/\D/g, "");
-    const CEPFormatado = CEP.match(/\d{5}-\d{3}/g)?.[0]?.substring(0, 8);
-    return CEPFormatado;
-  };
 
   const alerta = (data: FormData) => console.log("Funcionou", data);
 
-  const watchedFormData = watch();
   const handleDateChange = (value: DateValue | null) => {
     if (value) {
       const formattedDate = value.toString(); // Convert to string
@@ -112,26 +107,20 @@ export default function CadastroPage() {
       setValue("pac_birth_date", ""); // Clear the value if null
     }
   };
-  // Usar o hook para buscar o endereço com base no CEP
-
+    // Usar o hook para buscar o endereço com base no CEP
+  const { endereco, erro } = useCEPFinder("pac_addrs_zip");
   const hasResp = watch("pac_has_resp");
+  
+ // Preencher os campos de endereço quando o hook retornar dados
+  React.useEffect(() => {
+    if (endereco) {
+      setValue("pac_addrs_street_name", endereco.logradouro);
+      setValue("pac_addrs_city", endereco.localidade);
+      setValue("pac_addrs_uf", endereco.uf);
+    }
+  }, [endereco, setValue]);
 
-  const checkCEP = (event: React.FocusEvent<HTMLInputElement> | FocusEvent) => {
-    const inputEvent = event as React.FocusEvent<HTMLInputElement>;
-    const CEP = inputEvent.target.value.replace(/\D/g, "");
-
-    fetch(`https://viacep.com.br/ws/${CEP}/json`, {})
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Funcionou", data);
-        setValue("pac_addrs_street_name", data.logradouro);
-        setValue("pac_addrs_city", data.localidade);
-        setValue("pac_addrs_uf", data.uf);
-        setValue("pac_addrs_zip", CEP);
-      });
-  };
-
-  // Preencher os campos de endereço quando o hook retornar dados
+  const pac_addrs_zip = watch("pac_addrs_zip");
 
   return (
     <DefaultLayout>
@@ -145,8 +134,9 @@ export default function CadastroPage() {
               label="Nome do Paciente"
               labelPlacement="outside"
               placeholder="Digite seu Nome"
-              {...register("pac_name", { required: true })}
+              {...register("pac_name")}
             />
+
             <Select
               isRequired
               errorMessage={errors.pac_sex?.message}
@@ -154,7 +144,7 @@ export default function CadastroPage() {
               label="Sexo"
               labelPlacement="outside"
               placeholder="Masculino"
-              {...(register("pac_sex"), { required: true })}
+              {...register("pac_sex")}
             >
               <SelectItem key={"Masculino"} value="Masculino">
                 Masculino
@@ -169,7 +159,6 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_birth_date"
-              rules={{ required: true }}
               render={({}) => (
                 <DatePicker
                   isRequired
@@ -179,6 +168,7 @@ export default function CadastroPage() {
                 />
               )}
             />
+
             <Input
               isRequired
               errorMessage={errors.pac_whatsapp?.message}
@@ -188,6 +178,7 @@ export default function CadastroPage() {
               placeholder="11 12345-6789"
               {...registerWithMask("pac_whatsapp", "99 99999-9999")}
             />
+
             <Input
               isRequired
               errorMessage={errors.pac_email?.message}
@@ -195,7 +186,7 @@ export default function CadastroPage() {
               label="Email"
               labelPlacement="outside"
               placeholder="exemplo@exemplo.com"
-              {...(register("pac_email"), { required: true })}
+              {...register("pac_email")}
             />
             <Input
               isRequired
@@ -206,25 +197,14 @@ export default function CadastroPage() {
               placeholder="Digite seu CPF"
               {...registerWithMask("pac_cpf", "cpf")}
             />
-
-            <Controller
-              control={control}
-              name="pac_addrs_zip"
-              render={({}) => (
-                <Input
-                  isRequired
-                  errorMessage={errors.pac_addrs_zip?.message}
-                  isInvalid={!!errors.pac_addrs_zip}
-                  label="CEP"
-                  labelPlacement="outside"
-                  placeholder="00000-000"
-                  value={watchedFormData.pac_addrs_zip}
-                  {...registerWithMask("pac_addrs_zip", "99999-999")}
-                  onBlur={(e) =>
-                    checkCEP(e as React.FocusEvent<HTMLInputElement>)
-                  }
-                />
-              )}
+            <Input
+              isRequired
+              errorMessage={errors.pac_addrs_zip?.message}
+              isInvalid={errors.pac_addrs_zip ? true : false}
+              label="CEP"
+              labelPlacement="outside"
+              placeholder="00100-000"
+              {...registerWithMask("pac_addrs_zip", "99999-999")}
             />
 
             <div className="flex gap-4">
@@ -236,8 +216,7 @@ export default function CadastroPage() {
                 label="Endereço"
                 labelPlacement="outside"
                 placeholder="Av. Paulista"
-                value={watchedFormData.pac_addrs_street_name}
-                {...(register("pac_addrs_street_name"), { required: true })}
+                {...register("pac_addrs_street_name")}
               />
 
               <Input
@@ -248,8 +227,7 @@ export default function CadastroPage() {
                 label="Número"
                 labelPlacement="outside"
                 placeholder="304"
-                value={watchedFormData.pac_addrs_num}
-                {...(register("pac_addrs_num"), { required: true })}
+                {...register("pac_addrs_num")}
               />
             </div>
             <div className="flex gap-4">
@@ -261,8 +239,7 @@ export default function CadastroPage() {
                 label="Cidade"
                 labelPlacement="outside"
                 placeholder="São Paulo"
-                value={watchedFormData.pac_addrs_city}
-                {...(register("pac_addrs_city"), { required: true })}
+                {...register("pac_addrs_city")}
               />
               <Input
                 isRequired
@@ -272,8 +249,7 @@ export default function CadastroPage() {
                 label="Estado"
                 labelPlacement="outside"
                 placeholder="SP"
-                value={watchedFormData.pac_addrs_uf}
-                {...(register("pac_addrs_uf"), { required: true })}
+                {...register("pac_addrs_uf")}
               />
             </div>
             <Controller
@@ -293,6 +269,7 @@ export default function CadastroPage() {
                 />
               )}
             />
+
             <Controller
               control={control}
               name="pac_addrs_has_comp"
@@ -314,7 +291,7 @@ export default function CadastroPage() {
               name="pac_has_resp"
               render={({ field }) => (
                 <Checkbox
-                  defaultChecked={watchedFormData.pac_has_resp}
+                  checked={field.value}
                   size="sm"
                   onChange={() => field.onChange(!field.value)} // Inverte o valor atual
                 >
@@ -330,11 +307,11 @@ export default function CadastroPage() {
                 <Input
                   errorMessage={errors.pac_resp_name?.message}
                   isInvalid={errors.pac_resp_name ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={!hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Nome do Responsável"
                   labelPlacement="outside"
                   placeholder="Emilia Rodrigues"
-                  {...(register("pac_resp_name"), { required: hasResp })}
+                  {...register("pac_resp_name")}
                 />
               )}
             />
@@ -347,7 +324,7 @@ export default function CadastroPage() {
                 <Input
                   errorMessage={errors.pac_resp_whatsapp?.message}
                   isInvalid={errors.pac_resp_whatsapp ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={!hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Telefone do Responsável"
                   labelPlacement="outside"
                   placeholder="11 99999-9999"
@@ -363,12 +340,12 @@ export default function CadastroPage() {
                 <Input
                   errorMessage={errors.pac_resp_email?.message}
                   isInvalid={!!errors.pac_resp_email ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={!hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Email do Responsável"
                   labelPlacement="outside"
                   placeholder="johndean@example.com"
                   type="email"
-                  {...(register("pac_resp_email"), { required: hasResp })}
+                  {...register("pac_resp_email")}
                 />
               )}
             />
@@ -380,11 +357,11 @@ export default function CadastroPage() {
                 <Input
                   errorMessage={errors.pac_resp_occupation?.message}
                   isInvalid={errors.pac_resp_occupation ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={!hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Ocupação do Responsável"
                   labelPlacement="outside"
                   placeholder="Bancário"
-                  {...(register("pac_resp_occupation"), { required: hasResp })}
+                  {...register("pac_resp_occupation")}
                 />
               )}
             />
@@ -392,10 +369,6 @@ export default function CadastroPage() {
           <Button className="mx-auto" color="primary" type="submit">
             Enviar
           </Button>
-        </div>
-        <div>
-          {" "}
-          <pre>{JSON.stringify(watchedFormData, null, 2)}</pre>
         </div>
         {Object.keys(errors).length > 0 && (
           <div className="error-messages">
