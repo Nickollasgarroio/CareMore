@@ -7,14 +7,14 @@ import {
   Spacer,
   Checkbox,
 } from "@nextui-org/react";
-import { useForm, Controller, useFormState } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Input } from "@nextui-org/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
 import { DateValue } from "@internationalized/date";
-import { useHookFormMask, useInputMask } from "use-mask-input";
-import { supabase } from "@/supabaseClient";
+import { useHookFormMask } from "use-mask-input";
 
+import { supabase } from "@/supabaseClient";
 import { BgCard } from "@/components/bg-card";
 import DefaultLayout from "@/layouts/default";
 
@@ -51,44 +51,74 @@ export default function CadastroPage() {
       pac_cpf: z.string().min(11, { message: "CPF inválido" }),
       pac_birth_date: z
         .string()
-        .min(1)
+        .min(1, { message: "Data de nascimento é obrigatória" })
         .refine((value) => !isNaN(Date.parse(value)), {
           message: "Data de nascimento inválida",
         }),
       pac_email: z
         .string()
-        .min(1)
+        .min(1, { message: "Email é obrigatório" })
         .email({ message: "Email inválido" })
         .optional(),
       pac_addrs_street_name: z
         .string()
         .min(1, { message: "Endereço é obrigatório" }),
-      pac_addrs_num: z
-        .string()
-        .min(1)
-        .min(1, { message: "Número é obrigatório" }),
-      pac_addrs_city: z
-        .string()
-        .min(1)
-        .min(1, { message: "Cidade é obrigatória" }),
-      pac_addrs_uf: z
-        .string()
-        .min(1)
-        .min(1, { message: "Estado é obrigatório" }),
-      pac_addrs_zip: z.string().min(1).min(8, { message: "CEP inválido" }),
+      pac_addrs_num: z.string().min(1, { message: "Número é obrigatório" }),
+      pac_addrs_city: z.string().min(1, { message: "Cidade é obrigatória" }),
+      pac_addrs_uf: z.string().min(1, { message: "Estado é obrigatório" }),
+      pac_addrs_zip: z.string().min(8, { message: "CEP inválido" }),
       pac_addrs_has_comp: z.boolean(),
       pac_addrs_comp: z.string().optional(),
       pac_has_resp: z.boolean(),
-      pac_resp_name: z.string().optional(),
+      pac_resp_name: z.string().optional(), // Inicialmente opcional
       pac_resp_email: z.string().optional(),
       pac_resp_whatsapp: z.string().optional(),
       pac_resp_education: z.string().optional(),
       pac_resp_occupation: z.string().optional(),
     })
-    .superRefine((data) => {
-      if (data.pac_has_resp === true) {
+    .superRefine((data, ctx) => {
+      // Se o pac_has_resp for true, os campos do responsável são obrigatórios
+
+      if (data.pac_has_resp) {
+        if (!data.pac_resp_name) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["pac_resp_name"],
+            message: "Nome do responsável é obrigatório",
+          });
+        }
+        if (!data.pac_resp_email) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["pac_resp_email"],
+            message: "Email do responsável é obrigatório",
+          });
+        }
+        if (!data.pac_resp_whatsapp) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["pac_resp_whatsapp"],
+            message: "WhatsApp do responsável é obrigatório",
+          });
+        }
+        if (!data.pac_resp_education) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["pac_resp_education"],
+            message: "Escolaridade do responsável é obrigatória",
+          });
+        }
+        if (!data.pac_resp_occupation) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["pac_resp_occupation"],
+            message: "Ocupação do responsável é obrigatória",
+          });
+        }
+      } else {
+        // Se não tem responsável, limpar os campos do responsável
         data.pac_resp_name = "";
-        data.pac_resp_education = "";
+        data.pac_resp_email = "";
         data.pac_resp_whatsapp = "";
         data.pac_resp_education = "";
         data.pac_resp_occupation = "";
@@ -158,9 +188,11 @@ export default function CadastroPage() {
       setValue("pac_birth_date", ""); // Clear the value if null
     }
   };
+
   // Usar o hook para buscar o endereço com base no CEP
 
   const hasResp = watch("pac_has_resp");
+  const watchedForm = watch();
 
   const checkCEP = (event: React.FocusEvent<HTMLInputElement> | FocusEvent) => {
     const inputEvent = event as React.FocusEvent<HTMLInputElement>;
@@ -169,7 +201,7 @@ export default function CadastroPage() {
     fetch(`https://viacep.com.br/ws/${CEP}/json`, {})
       .then((response) => response.json())
       .then((data) => {
-        console.log("Funcionou", data);
+        console.log("CEP consultado com sucesso", data);
         setValue("pac_addrs_street_name", data.logradouro);
         setValue("pac_addrs_city", data.localidade);
         setValue("pac_addrs_uf", data.uf);
@@ -178,6 +210,36 @@ export default function CadastroPage() {
   };
 
   const values = getValues();
+
+  const estadosUF = [
+    "AC", // Acre
+    "AL", // Alagoas
+    "AM", // Amazonas
+    "AP", // Amapá
+    "BA", // Bahia
+    "CE", // Ceará
+    "DF", // Distrito Federal
+    "ES", // Espírito Santo
+    "GO", // Goiás
+    "MA", // Maranhão
+    "MG", // Minas Gerais
+    "MS", // Mato Grosso do Sul
+    "MT", // Mato Grosso
+    "PA", // Pará
+    "PB", // Paraíba
+    "PE", // Pernambuco
+    "PI", // Piauí
+    "PR", // Paraná
+    "RJ", // Rio de Janeiro
+    "RN", // Rio Grande do Norte
+    "RO", // Rondônia
+    "RR", // Roraima
+    "RS", // Rio Grande do Sul
+    "SC", // Santa Catarina
+    "SE", // Sergipe
+    "SP", // São Paulo
+    "TO", // Tocantins
+  ];
   // Preencher os campos de endereço quando o hook retornar dados
 
   return (
@@ -271,7 +333,9 @@ export default function CadastroPage() {
                   label="CEP"
                   labelPlacement="outside"
                   placeholder="00000-000"
-                  {...registerWithMask("pac_addrs_zip", "99999-999")}
+                  {...registerWithMask("pac_addrs_zip", "99999-999", {
+                    required: "Este campo é obrigatório",
+                  })}
                   onBlur={(e) =>
                     checkCEP(e as React.FocusEvent<HTMLInputElement>)
                   }
@@ -289,7 +353,7 @@ export default function CadastroPage() {
                 labelPlacement="outside"
                 placeholder="Av. Paulista"
                 value={values.pac_addrs_street_name}
-                {...(register("pac_addrs_street_name"), { required: true })}
+                {...register("pac_addrs_street_name")}
               />
 
               <Input
@@ -313,9 +377,33 @@ export default function CadastroPage() {
                 labelPlacement="outside"
                 placeholder="São Paulo"
                 value={values.pac_addrs_city}
-                {...(register("pac_addrs_city"), { required: true })}
+                {...register("pac_addrs_city")}
               />
-              <Input
+              <Controller
+                control={control}
+                name="pac_addrs_uf"
+                render={({ field: { value } }) => (
+                  <Select
+                    isRequired
+                    className="w-1/4"
+                    errorMessage={errors.pac_addrs_uf?.message}
+                    isInvalid={errors.pac_addrs_uf ? true : false}
+                    label="Estado"
+                    labelPlacement="outside"
+                    placeholder="SP"
+                    selectedKeys={value ? [value] : []} // Corrige a seleção do item atual
+                    value={values.pac_addrs_uf}
+                    {...register("pac_addrs_uf")}
+                  >
+                    {estadosUF.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+              />
+              {/* <Input
                 isRequired
                 className="w-1/4"
                 errorMessage={errors.pac_addrs_uf?.message}
@@ -325,7 +413,7 @@ export default function CadastroPage() {
                 placeholder="SP"
                 value={values.pac_addrs_uf}
                 {...register("pac_addrs_uf")}
-              />
+              /> */}
             </div>
             <Controller
               control={control}
@@ -340,11 +428,12 @@ export default function CadastroPage() {
                   label="Complemento"
                   labelPlacement="outside"
                   placeholder="Apartamento 204"
+                  value={values.pac_addrs_comp}
                   {...register("pac_addrs_comp")}
                 />
               )}
             />
-            <Controller
+            {/* <Controller
               control={control}
               name="pac_addrs_has_comp"
               render={({ field }) => (
@@ -356,7 +445,7 @@ export default function CadastroPage() {
                   Endereço não tem Complemento
                 </Checkbox>
               )}
-            />
+            /> */}
           </BgCard>
           <Spacer />
           <BgCard className="flex flex-col gap-4">
@@ -410,6 +499,11 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_resp_email"
+              rules={{
+                required: hasResp
+                  ? "Email do Responsável é obrigatório"
+                  : false,
+              }}
               render={() => (
                 <Input
                   errorMessage={errors.pac_resp_email?.message}
@@ -446,9 +540,9 @@ export default function CadastroPage() {
         </div>
         <div>
           {" "}
-          <pre>{JSON.stringify(getValues(), null, 2)}</pre>
+          <pre>{JSON.stringify(watchedForm, null, 2)}</pre>
         </div>
-        {Object.keys(errors).length > 0 && (
+        {/* {Object.keys(errors).length > 0 && (
           <div className="error-messages">
             <h4>Por favor, corrija os seguintes erros:</h4>
             <ul>
@@ -457,7 +551,7 @@ export default function CadastroPage() {
               ))}
             </ul>
           </div>
-        )}
+        )} */}
       </form>
     </DefaultLayout>
   );
