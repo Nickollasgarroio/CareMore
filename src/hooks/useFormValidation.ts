@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { cadastroSchema } from "@/schemas/formSchemas";
 import { z } from "zod";
-import { PacData } from "@/types/pacDataTypes"; // Altere o caminho conforme sua estrutura de pastas
+import { PacData } from "@/types/FormDataTypes"; // Altere o caminho conforme sua estrutura de pastas
 
 export const useFormValidation = (pacDataState: PacData) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});

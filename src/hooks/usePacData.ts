@@ -7,7 +7,7 @@ import { isValidPhone } from "@/utils/phoneUtils";
 import { isValidZipCode } from "@/utils/zipUtils";
 import { supabase } from "@/supabaseClient";
 import { cadastroSchema } from "@/schemas/formSchemas";
-import { PacData } from "@/types/pacDataTypes"; // Altere o caminho 
+import { PacData } from "@/types/FormDataTypes"; // Altere o caminho 
 
 
 export default function usePacFormState() {

@@ -5,7 +5,7 @@ import InputField from "@/components/CadastroForms/InputField";
 import SelectField from "@/components/CadastroForms/SelectField";
 import DatePicker from "@/components/CadastroForms/DatePicker";
 import { usePacForm } from "@/providers/PacFormContext"; // Usando o hook customizado
-import { PacData } from "@/types/pacDataTypes"; // Altere o caminho
+import { PacData } from "@/types/FormDataTypes"; // Altere o caminho
 
 export const PatientDetails = () => {
   const [showTeste, setShowTeste] = useState(false);
