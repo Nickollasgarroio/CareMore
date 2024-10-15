@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
 import { DateValue } from "@internationalized/date";
 import { useHookFormMask } from "use-mask-input";
+import { isValidCPF } from "@/utils/cpfUtils";
 
 import { supabase } from "@/supabaseClient";
 import { BgCard } from "@/components/bg-card";
@@ -28,6 +29,7 @@ export default function CadastroPage() {
     pac_email?: string;
     pac_addrs_street_name: string;
     pac_addrs_num: string;
+    pac_addrs_bairro: string;
     pac_addrs_city: string;
     pac_addrs_uf: string;
     pac_addrs_zip: string;
@@ -45,28 +47,35 @@ export default function CadastroPage() {
     .object({
       pac_name: z.string().min(3, { message: "Nome é obrigatório" }),
       pac_sex: z.enum(["Masculino", "Feminino", "Não Binário"], {
-        message: "Sexo é obrigatório",
+        message: "Campo obrigatório",
       }),
       pac_whatsapp: z.string().min(11, { message: "Campo obrigatório" }),
-      pac_cpf: z.string().min(11, { message: "CPF inválido" }),
+      pac_cpf: z
+        .string()
+        .min(11, { message: "CPF deve conter 11 dígitos" })
+        .refine(isValidCPF, {
+          message: "CPF inválido",
+        })
+        .optional(),
       pac_birth_date: z
         .string()
-        .min(1, { message: "Data de nascimento é obrigatória" })
+        .min(1, { message: "Campo obrigatório" })
         .refine((value) => !isNaN(Date.parse(value)), {
           message: "Data de nascimento inválida",
         }),
       pac_email: z
         .string()
-        .min(1, { message: "Email é obrigatório" })
+        .min(1, { message: "Campo obrigatório" })
         .email({ message: "Email inválido" })
         .optional(),
       pac_addrs_street_name: z
         .string()
-        .min(1, { message: "Endereço é obrigatório" }),
-      pac_addrs_num: z.string().min(1, { message: "Número é obrigatório" }),
-      pac_addrs_city: z.string().min(1, { message: "Cidade é obrigatória" }),
-      pac_addrs_uf: z.string().min(1, { message: "Estado é obrigatório" }),
-      pac_addrs_zip: z.string().min(8, { message: "CEP inválido" }),
+        .min(1, { message: "Campo obrigatório" }),
+      pac_addrs_num: z.string().min(1, { message: "Campo obrigatório" }),
+      pac_addrs_bairro: z.string().min(1, { message: "Campo obrigatório" }),
+      pac_addrs_city: z.string().min(1, { message: "Campo obrigatório" }),
+      pac_addrs_uf: z.string().min(1, { message: "Campo obrigatório" }),
+      pac_addrs_zip: z.string().min(8, { message: "Campo obrigatório" }),
       pac_addrs_has_comp: z.boolean(),
       pac_addrs_comp: z.string().optional(),
       pac_has_resp: z.boolean(),
@@ -84,35 +93,35 @@ export default function CadastroPage() {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["pac_resp_name"],
-            message: "Nome do responsável é obrigatório",
+            message: "Campo obrigatório",
           });
         }
         if (!data.pac_resp_email) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["pac_resp_email"],
-            message: "Email do responsável é obrigatório",
+            message: "Campo obrigatório",
           });
         }
         if (!data.pac_resp_whatsapp) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["pac_resp_whatsapp"],
-            message: "WhatsApp do responsável é obrigatório",
+            message: "Campo obrigatório",
           });
         }
         if (!data.pac_resp_education) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["pac_resp_education"],
-            message: "Escolaridade do responsável é obrigatória",
+            message: "Campo obrigatório",
           });
         }
         if (!data.pac_resp_occupation) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["pac_resp_occupation"],
-            message: "Ocupação do responsável é obrigatória",
+            message: "Campo obrigatório",
           });
         }
       } else {
@@ -169,6 +178,7 @@ export default function CadastroPage() {
           pac_resp_whatsapp: data.pac_resp_whatsapp,
           pac_resp_education: data.pac_resp_education,
           pac_resp_occupation: data.pac_resp_occupation,
+          pac_addrs_bairro: data.pac_addrs_bairro,
         },
       ]);
 
@@ -203,6 +213,7 @@ export default function CadastroPage() {
       .then((data) => {
         console.log("CEP consultado com sucesso", data);
         setValue("pac_addrs_street_name", data.logradouro);
+        setValue("pac_addrs_bairro", data.bairro);
         setValue("pac_addrs_city", data.localidade);
         setValue("pac_addrs_uf", data.uf);
         setValue("pac_addrs_zip", CEP);
@@ -313,9 +324,8 @@ export default function CadastroPage() {
               {...register("pac_email")}
             />
             <Input
-              isRequired
               errorMessage={errors.pac_cpf?.message}
-              isInvalid={errors.pac_cpf ? true : false}
+              isInvalid={errors.pac_cpf ? true : false} // Inverter a condição
               label="CPF"
               labelPlacement="outside"
               placeholder="Digite seu CPF"
@@ -343,17 +353,28 @@ export default function CadastroPage() {
               )}
             />
 
+            <Input
+              isRequired
+              className=""
+              errorMessage={errors.pac_addrs_street_name?.message}
+              isInvalid={errors.pac_addrs_street_name ? true : false}
+              label="Endereço"
+              labelPlacement="outside"
+              placeholder="Av. Paulista"
+              value={values.pac_addrs_street_name}
+              {...register("pac_addrs_street_name")}
+            />
             <div className="flex gap-4">
               <Input
                 isRequired
                 className="w-3/4"
-                errorMessage={errors.pac_addrs_street_name?.message}
-                isInvalid={errors.pac_addrs_street_name ? true : false}
-                label="Endereço"
+                errorMessage={errors.pac_addrs_bairro?.message}
+                isInvalid={errors.pac_addrs_bairro ? true : false}
+                label="Bairro"
                 labelPlacement="outside"
-                placeholder="Av. Paulista"
-                value={values.pac_addrs_street_name}
-                {...register("pac_addrs_street_name")}
+                placeholder="Bela Vista"
+                value={values.pac_addrs_bairro}
+                {...register("pac_addrs_bairro")}
               />
 
               <Input
@@ -367,7 +388,7 @@ export default function CadastroPage() {
                 {...register("pac_addrs_num")}
               />
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 h-max-fit">
               <Input
                 isRequired
                 className="w-3/4"
@@ -403,17 +424,6 @@ export default function CadastroPage() {
                   </Select>
                 )}
               />
-              {/* <Input
-                isRequired
-                className="w-1/4"
-                errorMessage={errors.pac_addrs_uf?.message}
-                isInvalid={errors.pac_addrs_uf ? true : false}
-                label="Estado"
-                labelPlacement="outside"
-                placeholder="SP"
-                value={values.pac_addrs_uf}
-                {...register("pac_addrs_uf")}
-              /> */}
             </div>
             <Controller
               control={control}
@@ -422,9 +432,9 @@ export default function CadastroPage() {
                 <Input
                   errorMessage={errors.pac_addrs_comp?.message}
                   isInvalid={errors.pac_addrs_comp ? true : false}
-                  isRequired={
-                    control._formValues.pac_addrs_has_comp ? false : true
-                  }
+                  // isRequired={
+                  //   control._formValues.pac_addrs_has_comp ? false : true
+                  // }
                   label="Complemento"
                   labelPlacement="outside"
                   placeholder="Apartamento 204"

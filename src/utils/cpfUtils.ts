@@ -7,9 +7,10 @@ export const formatCPF = (value: string): string => {
 };
 
 // Função para validar o CPF
-export const isValidCPF = (cpf: string): boolean => {
-  cpf = cpf.replace(/\D/g, "");
-  if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+export const isValidCPF = (cpf: string | undefined): boolean => {
+  if (!cpf) return false; // Verifica se o CPF é undefined ou vazio
+  cpf = cpf.replace(/\D/g, ""); // Remove non-numeric characters
+  if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false; // Invalid length or repeated digits
 
   const calcCheckDigit = (factor: number): number =>
     ((cpf
@@ -23,5 +24,8 @@ export const isValidCPF = (cpf: string): boolean => {
       11) %
     10;
 
-  return calcCheckDigit(10) === +cpf[9] && calcCheckDigit(11) === +cpf[10];
+  if (calcCheckDigit(10) !== Number(cpf[9])) return false; // Validate 1st check digit
+  if (calcCheckDigit(11) !== Number(cpf[10])) return false; // Validate 2nd check digit
+
+  return true;
 };
