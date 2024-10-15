@@ -7,12 +7,13 @@ import {
   Spacer,
   Checkbox,
 } from "@nextui-org/react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFormState } from "react-hook-form";
 import { Input } from "@nextui-org/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
 import { DateValue } from "@internationalized/date";
 import { useHookFormMask, useInputMask } from "use-mask-input";
+import { supabase } from "@/supabaseClient";
 
 import { BgCard } from "@/components/bg-card";
 import DefaultLayout from "@/layouts/default";
@@ -48,17 +49,33 @@ export default function CadastroPage() {
       }),
       pac_whatsapp: z.string().min(11, { message: "Campo obrigatório" }),
       pac_cpf: z.string().min(11, { message: "CPF inválido" }),
-      pac_birth_date: z.string().refine((value) => !isNaN(Date.parse(value)), {
-        message: "Data de nascimento inválida",
-      }),
-      pac_email: z.string().email({ message: "Email inválido" }).optional(),
+      pac_birth_date: z
+        .string()
+        .min(1)
+        .refine((value) => !isNaN(Date.parse(value)), {
+          message: "Data de nascimento inválida",
+        }),
+      pac_email: z
+        .string()
+        .min(1)
+        .email({ message: "Email inválido" })
+        .optional(),
       pac_addrs_street_name: z
         .string()
         .min(1, { message: "Endereço é obrigatório" }),
-      pac_addrs_num: z.string().min(1, { message: "Número é obrigatório" }),
-      pac_addrs_city: z.string().min(1, { message: "Cidade é obrigatória" }),
-      pac_addrs_uf: z.string().min(1, { message: "Estado é obrigatório" }),
-      pac_addrs_zip: z.string().min(8, { message: "CEP inválido" }),
+      pac_addrs_num: z
+        .string()
+        .min(1)
+        .min(1, { message: "Número é obrigatório" }),
+      pac_addrs_city: z
+        .string()
+        .min(1)
+        .min(1, { message: "Cidade é obrigatória" }),
+      pac_addrs_uf: z
+        .string()
+        .min(1)
+        .min(1, { message: "Estado é obrigatório" }),
+      pac_addrs_zip: z.string().min(1).min(8, { message: "CEP inválido" }),
       pac_addrs_has_comp: z.boolean(),
       pac_addrs_comp: z.string().optional(),
       pac_has_resp: z.boolean(),
@@ -85,24 +102,53 @@ export default function CadastroPage() {
     setValue,
     control,
     watch,
+    getValues, // Import this function
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       pac_has_resp: true,
       pac_addrs_has_comp: false,
     },
+    mode: "onChange", // This ensures validation runs on every change
   });
 
   const registerWithMask = useHookFormMask(register);
-  const formatCEP = (e: string) => {
-    const CEP = e.replace(/\D/g, "");
-    const CEPFormatado = CEP.match(/\d{5}-\d{3}/g)?.[0]?.substring(0, 8);
-    return CEPFormatado;
+
+  const onSubmit = async (data: FormData) => {
+    // Enviar dados para o Supabase
+    const { error } = await supabase
+      .from("pacientes") // Nome do schema
+      .insert([
+        {
+          pac_name: data.pac_name,
+          pac_sex: data.pac_sex,
+          pac_whatsapp: data.pac_whatsapp,
+          pac_cpf: data.pac_cpf,
+          pac_birth_date: data.pac_birth_date,
+          pac_email: data.pac_email,
+          pac_addrs_street_name: data.pac_addrs_street_name,
+          pac_addrs_num: data.pac_addrs_num,
+          pac_addrs_city: data.pac_addrs_city,
+          pac_addrs_uf: data.pac_addrs_uf,
+          pac_addrs_zip: data.pac_addrs_zip,
+          pac_addrs_has_comp: data.pac_addrs_has_comp,
+          pac_addrs_comp: data.pac_addrs_comp,
+          pac_has_resp: data.pac_has_resp,
+          pac_resp_name: data.pac_resp_name,
+          pac_resp_email: data.pac_resp_email,
+          pac_resp_whatsapp: data.pac_resp_whatsapp,
+          pac_resp_education: data.pac_resp_education,
+          pac_resp_occupation: data.pac_resp_occupation,
+        },
+      ]);
+
+    if (error) {
+      console.error("Erro ao inserir dados:", error.message);
+      alert("Erro ao inserir dados: " + error.message);
+    } else {
+      alert("Dados enviados com sucesso!");
+    }
   };
-
-  const alerta = (data: FormData) => console.log("Funcionou", data);
-
-  const watchedFormData = watch();
   const handleDateChange = (value: DateValue | null) => {
     if (value) {
       const formattedDate = value.toString(); // Convert to string
@@ -131,11 +177,12 @@ export default function CadastroPage() {
       });
   };
 
+  const values = getValues();
   // Preencher os campos de endereço quando o hook retornar dados
 
   return (
     <DefaultLayout>
-      <form onSubmit={handleSubmit(alerta)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-4 max-w-[400px] mx-auto">
           <BgCard className="flex flex-col gap-4">
             <Input
@@ -145,31 +192,37 @@ export default function CadastroPage() {
               label="Nome do Paciente"
               labelPlacement="outside"
               placeholder="Digite seu Nome"
-              {...register("pac_name", { required: true })}
+              {...register("pac_name")}
             />
-            <Select
-              isRequired
-              errorMessage={errors.pac_sex?.message}
-              isInvalid={errors.pac_sex ? true : false}
-              label="Sexo"
-              labelPlacement="outside"
-              placeholder="Masculino"
-              {...(register("pac_sex"), { required: true })}
-            >
-              <SelectItem key={"Masculino"} value="Masculino">
-                Masculino
-              </SelectItem>
-              <SelectItem key={"Feminino"} value="Feminino">
-                Feminino
-              </SelectItem>
-              <SelectItem key={"Não Binário"} value="Não Binário">
-                Não Binário
-              </SelectItem>
-            </Select>
+            <Controller
+              control={control}
+              name="pac_sex"
+              render={() => (
+                <Select
+                  isRequired
+                  errorMessage={errors.pac_sex?.message}
+                  isInvalid={errors.pac_sex ? true : false}
+                  label="Sexo"
+                  labelPlacement="outside"
+                  placeholder="Masculino"
+                  {...register("pac_sex")}
+                >
+                  <SelectItem key={"Masculino"} value="Masculino">
+                    Masculino
+                  </SelectItem>
+                  <SelectItem key={"Feminino"} value="Feminino">
+                    Feminino
+                  </SelectItem>
+                  <SelectItem key={"Não Binário"} value="Não Binário">
+                    Não Binário
+                  </SelectItem>
+                </Select>
+              )}
+            />
+
             <Controller
               control={control}
               name="pac_birth_date"
-              rules={{ required: true }}
               render={({}) => (
                 <DatePicker
                   isRequired
@@ -195,7 +248,7 @@ export default function CadastroPage() {
               label="Email"
               labelPlacement="outside"
               placeholder="exemplo@exemplo.com"
-              {...(register("pac_email"), { required: true })}
+              {...register("pac_email")}
             />
             <Input
               isRequired
@@ -218,7 +271,6 @@ export default function CadastroPage() {
                   label="CEP"
                   labelPlacement="outside"
                   placeholder="00000-000"
-                  value={watchedFormData.pac_addrs_zip}
                   {...registerWithMask("pac_addrs_zip", "99999-999")}
                   onBlur={(e) =>
                     checkCEP(e as React.FocusEvent<HTMLInputElement>)
@@ -236,7 +288,7 @@ export default function CadastroPage() {
                 label="Endereço"
                 labelPlacement="outside"
                 placeholder="Av. Paulista"
-                value={watchedFormData.pac_addrs_street_name}
+                value={values.pac_addrs_street_name}
                 {...(register("pac_addrs_street_name"), { required: true })}
               />
 
@@ -248,8 +300,7 @@ export default function CadastroPage() {
                 label="Número"
                 labelPlacement="outside"
                 placeholder="304"
-                value={watchedFormData.pac_addrs_num}
-                {...(register("pac_addrs_num"), { required: true })}
+                {...register("pac_addrs_num")}
               />
             </div>
             <div className="flex gap-4">
@@ -261,7 +312,7 @@ export default function CadastroPage() {
                 label="Cidade"
                 labelPlacement="outside"
                 placeholder="São Paulo"
-                value={watchedFormData.pac_addrs_city}
+                value={values.pac_addrs_city}
                 {...(register("pac_addrs_city"), { required: true })}
               />
               <Input
@@ -272,8 +323,8 @@ export default function CadastroPage() {
                 label="Estado"
                 labelPlacement="outside"
                 placeholder="SP"
-                value={watchedFormData.pac_addrs_uf}
-                {...(register("pac_addrs_uf"), { required: true })}
+                value={values.pac_addrs_uf}
+                {...register("pac_addrs_uf")}
               />
             </div>
             <Controller
@@ -314,7 +365,7 @@ export default function CadastroPage() {
               name="pac_has_resp"
               render={({ field }) => (
                 <Checkbox
-                  defaultChecked={watchedFormData.pac_has_resp}
+                  defaultChecked={hasResp}
                   size="sm"
                   onChange={() => field.onChange(!field.value)} // Inverte o valor atual
                 >
@@ -334,7 +385,7 @@ export default function CadastroPage() {
                   label="Nome do Responsável"
                   labelPlacement="outside"
                   placeholder="Emilia Rodrigues"
-                  {...(register("pac_resp_name"), { required: hasResp })}
+                  {...register("pac_resp_name")}
                 />
               )}
             />
@@ -368,7 +419,7 @@ export default function CadastroPage() {
                   labelPlacement="outside"
                   placeholder="johndean@example.com"
                   type="email"
-                  {...(register("pac_resp_email"), { required: hasResp })}
+                  {...register("pac_resp_email")}
                 />
               )}
             />
@@ -384,7 +435,7 @@ export default function CadastroPage() {
                   label="Ocupação do Responsável"
                   labelPlacement="outside"
                   placeholder="Bancário"
-                  {...(register("pac_resp_occupation"), { required: hasResp })}
+                  {...register("pac_resp_occupation")}
                 />
               )}
             />
@@ -395,7 +446,7 @@ export default function CadastroPage() {
         </div>
         <div>
           {" "}
-          <pre>{JSON.stringify(watchedFormData, null, 2)}</pre>
+          <pre>{JSON.stringify(getValues(), null, 2)}</pre>
         </div>
         {Object.keys(errors).length > 0 && (
           <div className="error-messages">
