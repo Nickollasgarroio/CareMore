@@ -94,7 +94,7 @@ export default function CadastroPage() {
     fetch(`https://viacep.com.br/ws/${CEP}/json`, {})
       .then((response) => response.json())
       .then((data) => {
-        // console.log("CEP consultado com sucesso", data);
+        console.log("CEP consultado com sucesso", data);
         setValue("pac_addrs_street_name", data.logradouro);
         setValue("pac_addrs_bairro", data.bairro);
         setValue("pac_addrs_city", data.localidade);
@@ -185,86 +185,110 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_addrs_zip"
-              render={({}) => (
+              render={({ field }) => (
                 <Input
+                  {...field}
                   isRequired
                   errorMessage={errors.pac_addrs_zip?.message}
                   isInvalid={!!errors.pac_addrs_zip}
                   label="CEP"
                   labelPlacement="outside"
                   placeholder="00000-000"
-                  {...registerWithMask("pac_addrs_zip", "99999-999", {
-                    required: "Este campo é obrigatório",
-                  })}
-                  onBlur={(e) =>
-                    checkCEP(e as React.FocusEvent<HTMLInputElement>)
-                  }
+                  {...registerWithMask("pac_addrs_zip", "99999-999")}
+                  onBlur={(e) => {
+                    field.onBlur();
+                    checkCEP(e as React.FocusEvent<HTMLInputElement>); // Consulta o CEP ao sair do campo
+                  }}
                 />
               )}
             />
 
-            <Input
-              isRequired
-              className=""
-              errorMessage={errors.pac_addrs_street_name?.message}
-              isInvalid={errors.pac_addrs_street_name ? true : false}
-              label="Endereço"
-              labelPlacement="outside"
-              placeholder="Av. Paulista"
-              value={values.pac_addrs_street_name}
-              {...register("pac_addrs_street_name")}
+            <Controller
+              control={control}
+              name="pac_addrs_street_name"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  isRequired
+                  errorMessage={errors.pac_addrs_street_name?.message}
+                  isInvalid={!!errors.pac_addrs_street_name}
+                  label="Endereço"
+                  labelPlacement="outside"
+                  value={field.value || ""} // Garante que o valor é atualizado
+                  placeholder="Av. Paulista"
+                />
+              )}
             />
             <div className="flex gap-4">
-              <Input
-                isRequired
-                className="w-3/4"
-                errorMessage={errors.pac_addrs_bairro?.message}
-                isInvalid={errors.pac_addrs_bairro ? true : false}
-                label="Bairro"
-                labelPlacement="outside"
-                placeholder="Bela Vista"
-                value={values.pac_addrs_bairro}
-                {...register("pac_addrs_bairro")}
+              <Controller
+                control={control}
+                name="pac_addrs_bairro"
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    isRequired
+                    className="w-3/4"
+                    errorMessage={errors.pac_addrs_bairro?.message}
+                    isInvalid={!!errors.pac_addrs_bairro}
+                    label="Bairro"
+                    labelPlacement="outside"
+                    value={field.value || ""}
+                    placeholder="Bela Vista"
+                  />
+                )}
               />
 
-              <Input
-                isRequired
-                className="w-1/4"
-                errorMessage={errors.pac_addrs_num?.message}
-                isInvalid={errors.pac_addrs_num ? true : false}
-                label="Número"
-                labelPlacement="outside"
-                placeholder="304"
-                {...register("pac_addrs_num")}
+              <Controller
+                control={control}
+                name="pac_addrs_num"
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    isRequired
+                    className="w-1/4"
+                    errorMessage={errors.pac_addrs_num?.message}
+                    isInvalid={!!errors.pac_addrs_num}
+                    label="Número"
+                    labelPlacement="outside"
+                    value={field.value || ""}
+                    placeholder="3012"
+                  />
+                )}
               />
             </div>
             <div className="flex gap-4 h-max-fit">
-              <Input
-                isRequired
-                className="w-3/4"
-                errorMessage={errors.pac_addrs_city?.message}
-                isInvalid={errors.pac_addrs_city ? true : false}
-                label="Cidade"
-                labelPlacement="outside"
-                placeholder="São Paulo"
-                value={values.pac_addrs_city}
-                {...register("pac_addrs_city")}
+              <Controller
+                control={control}
+                name="pac_addrs_city"
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    isRequired
+                    className="w-3/4"
+                    errorMessage={errors.pac_addrs_city?.message}
+                    isInvalid={!!errors.pac_addrs_city}
+                    label="Cidade"
+                    labelPlacement="outside"
+                    value={field.value || ""}
+                    placeholder="São Paulo"
+                  />
+                )}
               />
               <Controller
                 control={control}
                 name="pac_addrs_uf"
-                render={({ field: { value } }) => (
+                render={({ field }) => (
                   <Select
                     isRequired
                     className="w-1/4"
                     errorMessage={errors.pac_addrs_uf?.message}
-                    isInvalid={errors.pac_addrs_uf ? true : false}
+                    isInvalid={!!errors.pac_addrs_uf} // Simplificação da verificação de erro
                     label="Estado"
                     labelPlacement="outside"
                     placeholder="SP"
-                    selectedKeys={value ? [value] : []} // Corrige a seleção do item atual
-                    value={values.pac_addrs_uf}
-                    {...register("pac_addrs_uf")}
+                    selectedKeys={field.value ? [field.value] : []} // Corrige a seleção do item atual
+                    onSelectionChange={(selected) => field.onChange(selected)} // Captura a mudança no campo
+                    {...field} // Garante que `field` tenha prioridade sobre outras props
                   >
                     {estadosUF.map((city) => (
                       <SelectItem key={city} value={city}>
@@ -393,7 +417,10 @@ export default function CadastroPage() {
             Enviar
           </Button>
         </div>
-        <div> {/* <pre>{JSON.stringify(watchedForm, null, 2)}</pre> */}</div>
+        <div>
+          {" "}
+          <pre>{JSON.stringify(values, null, 2)}</pre>
+        </div>
         {/* {Object.keys(errors).length > 0 && (
           <div className="error-messages">
             <h4>Por favor, corrija os seguintes erros:</h4>

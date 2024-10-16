@@ -1,78 +1,101 @@
+import React, { useEffect, useState } from "react";
 import {
-  Button,
-  DatePicker,
-  Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  Select,
+  SelectItem,
   Textarea,
-  User,
-  Link,
+  DatePicker,
+  Button,
+  Spacer,
 } from "@nextui-org/react";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { today, getLocalTimeZone } from "@internationalized/date";
+
+import FormData from "@/types/FormDataTypes";
+import formSchema from "@/schemas/formSchemas";
+import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
+import { title } from "@/components/primitives";
+
+// Hook para buscar dados do Supabase
+const useFetchPacientes = () => {
+  const [dataTeste, setDataTeste] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const { data: pacientes, error } = await supabase
+      .from("pacientes")
+      .select("pac_id, pac_name");
+
+    if (error) {
+      setError("Erro ao buscar pacientes");
+      setDataTeste([]);
+    } else {
+      setDataTeste(pacientes);
+    }
+    setLoading(false);
+  };
+
+  return { dataTeste, loading, error, fetchData };
+};
 
 export default function ProntuariosPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-    pac_nome: "Nickollas Giordano Arroio",
-    pac_idade: "26",
-    prof_name: "Helen Gimenes",
-    prof_espec: "Fonoaudiologia",
-    prof_registro: "1 23456",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    control,
+    getValues,
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {},
+    mode: "onChange",
   });
+
+  const { dataTeste, loading, error, fetchData } = useFetchPacientes();
+
+  // useEffect para carregar dados ao montar a página
+  useEffect(() => {
+    fetchData();
+  }, []); // O array vazio [] garante que o useEffect rode apenas uma vez, quando o componente for montado
 
   return (
     <DefaultLayout>
-      <form className="flex flex-col mx-auto gap-4 max-w-[400px]">
-        <div className="flex flex-row gap-4">
-          <Popover showArrow placement="bottom" offset={20}>
-            <PopoverTrigger>
-              <Input
-                label="Nome do Paciente"
-                labelPlacement="outside"
-                value={formData.pac_nome}
-              ></Input>
-            </PopoverTrigger>
-            <PopoverContent>
-              <div className="flex flex-col p-4">
-                <User
-                  as="button"
-                  name={formData.pac_nome}
-                  description={`${formData.pac_idade} anos`}
-                ></User>
-                <Link className="text-xs justify-end">Editar</Link>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <Input
-            className="w-14 text-center"
-            label="Idade"
-            labelPlacement="outside"
-            value={formData.pac_idade}
-            isDisabled
-          ></Input>
-        </div>
-
-        <DatePicker
-          label="Data do atendimento"
+      <div className="w-[400px] flex flex-col gap-4 mx-auto">
+        <h1 className={title()}>Prontuários</h1>
+        <Spacer />
+        <Select
+          label="Paciente"
           labelPlacement="outside"
-          isRequired={true}
+          placeholder="Selecione um paciente"
+        >
+          {dataTeste.map((paciente) => (
+            <SelectItem key={paciente.pac_id} value={paciente.pac_id}>
+              {loading ? "Carregando..." : paciente.pac_name}
+            </SelectItem>
+          ))}
+        </Select>
+        <DatePicker
+          isRequired
+          defaultValue={today(getLocalTimeZone())}
+          label="Data do Prontuário"
+          labelPlacement="outside"
+          maxValue={today(getLocalTimeZone())}
         />
         <Textarea
-          label="Evolução do paciente"
+          isRequired
+          label="Evolução"
           labelPlacement="outside"
-          minRows={20}
-          maxRows={40}
-          isRequired={true}
+          minRows={10}
         />
-        <Button type="submit" color="primary" className="max-w-16 self-center">
+        <Button className="w-fit mx-auto" color="primary" type="submit">
           Enviar
         </Button>
-      </form>
+        {/* <div>{JSON.stringify(dataTeste)}</div> */}
+      </div>
     </DefaultLayout>
   );
 }
