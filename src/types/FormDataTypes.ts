@@ -2,6 +2,7 @@
 import { generos } from "@/pages/configs/cadastroConfigs";
 
 type FormData = {
+  pac_id: string;
   pac_name: string;
   pac_sex: string;
   pac_whatsapp: string;
