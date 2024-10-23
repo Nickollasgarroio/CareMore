@@ -110,7 +110,7 @@ export default function CadastroPage() {
   };
 
   const values = getValues();
-  const hasResp = watch("pac_has_resp");
+  const hasResp = watch("pac_has_resp", true);
 
   // Preencher os campos de endereço quando o hook retornar dados
 
@@ -339,15 +339,14 @@ export default function CadastroPage() {
               name="pac_resp_name"
               render={(field) => (
                 <Input
-                  {...field}
-                  errorMessage={errors.pac_resp_name?.message}
-                  isInvalid={errors.pac_resp_name ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
-                  label="Nome do Responsável"
-                  labelPlacement="outside"
-                  placeholder="Emilia Rodrigues"
-                  value={field.field.value || ""}
-                  {...register("pac_resp_name")}
+                errorMessage={errors.pac_resp_name?.message}
+                isInvalid={!!errors.pac_resp_name} // Use double negation to ensure boolean type
+                isRequired={hasResp} // Conditionally make the field required based on hasResp
+                label="Nome do Responsável"
+                labelPlacement="outside"
+                placeholder="Emilia Rodrigues"
+                {...field} // This includes value, onChange, onBlur, etc.
+                
                 />
               )}
             />
@@ -355,9 +354,9 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_resp_whatsapp"
-              render={(field) => (
+              render={() => (
                 <Input
-                  {...field}
+                  
                   errorMessage={errors.pac_resp_whatsapp?.message}
                   isInvalid={errors.pac_resp_whatsapp ? true : false}
                   isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
@@ -372,7 +371,7 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_resp_email"
-              render={(field) => (
+              render={({field}) => (
                 <Input
                   {...field}
                   errorMessage={errors.pac_resp_email?.message}
@@ -398,7 +397,6 @@ export default function CadastroPage() {
                   label="Ocupação do Responsável"
                   labelPlacement="outside"
                   placeholder="Bancário"
-                  value={field.field.value || ""}
                 />
               )}
             />

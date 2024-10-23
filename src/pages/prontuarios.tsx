@@ -276,7 +276,7 @@ export default function ProntuariosPage() {
             <BgCard className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold">Responsável</h2>
               <Input
-                isDisabled
+                
                 label="Nome Completo"
                 labelPlacement="outside"
                 placeholder="Responsável"
