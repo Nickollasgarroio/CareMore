@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Select,
@@ -6,11 +6,12 @@ import {
   DatePicker,
   Spacer,
   Checkbox,
+  useDisclosure,
 } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form";
 import { Input } from "@nextui-org/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DateValue } from "@internationalized/date";
+import { DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { useHookFormMask } from "use-mask-input";
 
 import FormData from "@/types/FormDataTypes";
@@ -19,66 +20,71 @@ import formSchema from "@/schemas/formSchemas";
 import { supabase } from "@/supabaseClient";
 import { BgCard } from "@/components/bg-card";
 import DefaultLayout from "@/layouts/default";
+import { CadastroModal } from "@/components/CadastroModal";
 
 export default function CadastroPage() {
+  // const [error, setError] = React.useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     control,
-    getValues, // Import this function
+    getValues,
+    watch, // Import this function
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       pac_has_resp: true,
-      pac_addrs_has_comp: false,
     },
     mode: "onChange", // This ensures validation runs on every change
   });
 
   const registerWithMask = useHookFormMask(register);
+  const [error, setError] = useState<string | null>(null);
 
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); //declaração para uso do hook do modal
   const onSubmitSupabase = async (data: FormData) => {
     // Enviar dados para o Supabase
-    const { error } = await supabase
-      .from("pacientes") // Nome do formSchema
-      .insert([
-        {
-          pac_name: data.pac_name,
-          pac_sex: data.pac_sex,
-          pac_whatsapp: data.pac_whatsapp,
-          pac_cpf: data.pac_cpf,
-          pac_birth_date: data.pac_birth_date,
-          pac_email: data.pac_email,
-          pac_addrs_street_name: data.pac_addrs_street_name,
-          pac_addrs_num: data.pac_addrs_num,
-          pac_addrs_city: data.pac_addrs_city,
-          pac_addrs_uf: data.pac_addrs_uf,
-          pac_addrs_zip: data.pac_addrs_zip,
-          pac_addrs_has_comp: data.pac_addrs_has_comp,
-          pac_addrs_comp: data.pac_addrs_comp,
-          pac_has_resp: data.pac_has_resp,
-          pac_resp_name: data.pac_resp_name,
-          pac_resp_email: data.pac_resp_email,
-          pac_resp_whatsapp: data.pac_resp_whatsapp,
-          pac_resp_education: data.pac_resp_education,
-          pac_resp_occupation: data.pac_resp_occupation,
-          pac_addrs_bairro: data.pac_addrs_bairro,
-        },
-      ]);
+    const { error } = await supabase.from("pacientes").insert([
+      {
+        pac_name: data.pac_name,
+        pac_sex: data.pac_sex,
+        pac_whatsapp: data.pac_whatsapp,
+        pac_cpf: data.pac_cpf,
+        pac_birth_date: data.pac_birth_date,
+        pac_email: data.pac_email,
+        pac_addrs_street_name: data.pac_addrs_street_name,
+        pac_addrs_num: data.pac_addrs_num,
+        pac_addrs_city: data.pac_addrs_city,
+        pac_addrs_uf: data.pac_addrs_uf,
+        pac_addrs_zip: data.pac_addrs_zip,
+        pac_addrs_comp: data.pac_addrs_comp,
+        pac_has_resp: data.pac_has_resp,
+        pac_resp_name: data.pac_resp_name || "",
+        pac_resp_email: data.pac_resp_email || "",
+        pac_resp_whatsapp: data.pac_resp_whatsapp || "",
+        pac_resp_education: data.pac_resp_education || "",
+        pac_resp_occupation: data.pac_resp_occupation || "",
+        pac_addrs_bairro: data.pac_addrs_bairro || "",
+      },
+    ]);
 
     if (error) {
-      // console.error("Erro ao inserir dados:", error.message);
-      alert("Erro ao inserir dados: " + error.message);
+      console.log(error);
+      setError(error.message);
     } else {
-      alert("Dados enviados com sucesso!");
+      console.log(`Paciente Cadastrado com sucesso`);
     }
+    onOpen();
+
+    // Exibir o modal independentemente do resultado, com mensagem de sucesso ou erro
+    // setModalVisible(true);
   };
   const handleDateChange = (value: DateValue | null) => {
     if (value) {
       const formattedDate = value.toString(); // Convert to string
-
       setValue("pac_birth_date", formattedDate);
     } else {
       setValue("pac_birth_date", ""); // Clear the value if null
@@ -104,12 +110,13 @@ export default function CadastroPage() {
   };
 
   const values = getValues();
+  const hasResp = watch("pac_has_resp");
 
   // Preencher os campos de endereço quando o hook retornar dados
 
   return (
     <DefaultLayout>
-      <form onSubmit={handleSubmit(onSubmitSupabase)}>
+      <form onSubmit={handleSubmit(onSubmitSupabase)} noValidate>
         <div className="flex flex-col gap-4 max-w-[400px] mx-auto">
           <BgCard className="flex flex-col gap-4">
             <Input
@@ -151,6 +158,7 @@ export default function CadastroPage() {
                   isRequired
                   label="Data de Nascimento"
                   labelPlacement="outside"
+                  maxValue={today(getLocalTimeZone())}
                   onChange={handleDateChange}
                 />
               )}
@@ -214,8 +222,8 @@ export default function CadastroPage() {
                   isInvalid={!!errors.pac_addrs_street_name}
                   label="Endereço"
                   labelPlacement="outside"
-                  value={field.value || ""} // Garante que o valor é atualizado
                   placeholder="Av. Paulista"
+                  value={field.value || ""} // Garante que o valor é atualizado
                 />
               )}
             />
@@ -232,8 +240,8 @@ export default function CadastroPage() {
                     isInvalid={!!errors.pac_addrs_bairro}
                     label="Bairro"
                     labelPlacement="outside"
-                    value={field.value || ""}
                     placeholder="Bela Vista"
+                    value={field.value || ""}
                   />
                 )}
               />
@@ -250,8 +258,8 @@ export default function CadastroPage() {
                     isInvalid={!!errors.pac_addrs_num}
                     label="Número"
                     labelPlacement="outside"
-                    value={field.value || ""}
                     placeholder="3012"
+                    value={field.value || ""}
                   />
                 )}
               />
@@ -269,8 +277,8 @@ export default function CadastroPage() {
                     isInvalid={!!errors.pac_addrs_city}
                     label="Cidade"
                     labelPlacement="outside"
-                    value={field.value || ""}
                     placeholder="São Paulo"
+                    value={field.value || ""}
                   />
                 )}
               />
@@ -301,77 +309,58 @@ export default function CadastroPage() {
             </div>
             <Controller
               control={control}
-              name="pac_addrs_has_comp"
-              render={() => (
+              name="pac_addrs_comp"
+              render={({ field }) => (
                 <Input
+                  {...field}
                   errorMessage={errors.pac_addrs_comp?.message}
-                  isInvalid={errors.pac_addrs_comp ? true : false}
-                  // isRequired={
-                  //   control._formValues.pac_addrs_has_comp ? false : true
-                  // }
+                  isInvalid={!!errors.pac_addrs_comp}
                   label="Complemento"
                   labelPlacement="outside"
-                  placeholder="Apartamento 204"
-                  value={values.pac_addrs_comp}
-                  {...register("pac_addrs_comp")}
+                  placeholder="Complemento"
+                  value={field.value || ""}
                 />
               )}
             />
-            {/* <Controller
-              control={control}
-              name="pac_addrs_has_comp"
-              render={({ field }) => (
-                <Checkbox
-                  isSelected={field.value}
-                  size="sm"
-                  onChange={() => field.onChange(!field.value)} // Inverte o valor atual
-                >
-                  Endereço não tem Complemento
-                </Checkbox>
-              )}
-            /> */}
           </BgCard>
           <Spacer />
           <BgCard className="flex flex-col gap-4">
-            <Controller
-              control={control}
-              name="pac_has_resp"
-              render={({ field }) => (
-                <Checkbox
-                  defaultChecked={values.pac_has_resp}
-                  size="sm"
-                  onChange={() => field.onChange(!field.value)} // Inverte o valor atual
-                >
-                  Paciente não tem Responsável
-                </Checkbox>
-              )}
-            />
+            <Checkbox
+              defaultSelected
+              onChange={() => {
+                setValue("pac_has_resp", !hasResp);
+              }}
+            >
+              Paciente tem responsável
+            </Checkbox>
 
             <Controller
               control={control}
               name="pac_resp_name"
-              render={() => (
+              render={(field) => (
                 <Input
+                  {...field}
                   errorMessage={errors.pac_resp_name?.message}
                   isInvalid={errors.pac_resp_name ? true : false}
-                  isRequired={values.pac_has_resp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Nome do Responsável"
                   labelPlacement="outside"
                   placeholder="Emilia Rodrigues"
+                  value={field.field.value || ""}
                   {...register("pac_resp_name")}
                 />
               )}
             />
 
-            {/* Repita para os outros campos de responsável */}
             <Controller
               control={control}
               name="pac_resp_whatsapp"
-              render={() => (
+              render={(field) => (
                 <Input
+                  {...field}
                   errorMessage={errors.pac_resp_whatsapp?.message}
                   isInvalid={errors.pac_resp_whatsapp ? true : false}
-                  isRequired={values.pac_has_resp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Telefone do Responsável"
                   labelPlacement="outside"
                   placeholder="11 99999-9999"
@@ -383,16 +372,16 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_resp_email"
-              render={() => (
+              render={(field) => (
                 <Input
+                  {...field}
                   errorMessage={errors.pac_resp_email?.message}
                   isInvalid={!!errors.pac_resp_email ? true : false}
-                  isRequired={values.pac_has_resp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Email do Responsável"
                   labelPlacement="outside"
                   placeholder="johndean@example.com"
                   type="email"
-                  {...register("pac_resp_email")}
                 />
               )}
             />
@@ -400,37 +389,35 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_resp_occupation"
-              render={() => (
+              render={(field) => (
                 <Input
+                  {...field}
                   errorMessage={errors.pac_resp_occupation?.message}
                   isInvalid={errors.pac_resp_occupation ? true : false}
-                  isRequired={values.pac_has_resp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
                   label="Ocupação do Responsável"
                   labelPlacement="outside"
                   placeholder="Bancário"
-                  {...register("pac_resp_occupation")}
+                  value={field.field.value || ""}
                 />
               )}
             />
           </BgCard>
           <Button className="mx-auto" color="primary" type="submit">
             Enviar
-          </Button>
-        </div>
-        <div>
-          {" "}
+          </Button>{" "}
           <pre>{JSON.stringify(values, null, 2)}</pre>
+          <CadastroModal
+            status={error ? "error" : "success"}
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            message={
+              error
+                ? `Erro ao enviar dados erro ${error}`
+                : "Paciente cadastrado com Sucesso!"
+            }
+          />
         </div>
-        {/* {Object.keys(errors).length > 0 && (
-          <div className="error-messages">
-            <h4>Por favor, corrija os seguintes erros:</h4>
-            <ul>
-              {Object.entries(errors).map(([key, value]) => (
-                <li key={key}>{key}</li>
-              ))}
-            </ul>
-          </div>
-        )} */}
       </form>
     </DefaultLayout>
   );

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable no-console */
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectItem,
@@ -6,7 +7,6 @@ import {
   Spacer,
   Input,
   DatePicker,
-  Divider,
 } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,8 +18,6 @@ import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { BgCard } from "@/components/bg-card";
-
-import { EditIcon } from "@/components/icons";
 
 // Função para calcular a idade do paciente
 const calcularIdadePaciente = (dataNascimento: string | Date): number => {
@@ -78,7 +76,7 @@ export default function ProntuariosPage() {
     mode: "onChange",
   });
 
-  const { dataTeste, loading, error, fetchData } = useFetchPacientes();
+  const { dataTeste, loading, fetchData } = useFetchPacientes();
 
   useEffect(() => {
     fetchData();
@@ -148,6 +146,7 @@ export default function ProntuariosPage() {
                     value={field.value}
                     onChange={(event) => {
                       const value = event.target.value;
+
                       field.onChange(value);
                       handleSelectPaciente(value);
                     }}

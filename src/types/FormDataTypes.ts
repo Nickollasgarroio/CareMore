@@ -1,8 +1,8 @@
 // types/pacDataTypes.ts
-import { generos } from "@/pages/configs/cadastroConfigs";
+
 
 type FormData = {
-  pac_id: string;
+  pac_id?: string;
   pac_name: string;
   pac_sex: string;
   pac_whatsapp: string;
@@ -15,7 +15,6 @@ type FormData = {
   pac_addrs_city: string;
   pac_addrs_uf: string;
   pac_addrs_zip: string;
-  pac_addrs_has_comp: boolean;
   pac_addrs_comp?: string;
   pac_has_resp: boolean;
   pac_resp_name?: string;

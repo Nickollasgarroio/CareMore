@@ -1,9 +1,7 @@
 import { z, ZodType } from "zod";
 
 import { isValidCPF } from "@/utils/cpfUtils";
-
 import { generos } from "@/pages/configs/cadastroConfigs";
-
 import FormData from "@/types/FormDataTypes";
 
 const formSchema: ZodType<FormData> = z
@@ -37,7 +35,6 @@ const formSchema: ZodType<FormData> = z
     pac_addrs_city: z.string().min(1, { message: "Campo obrigatório" }),
     pac_addrs_uf: z.string().min(1, { message: "Campo obrigatório" }),
     pac_addrs_zip: z.string().min(8, { message: "Campo obrigatório" }),
-    pac_addrs_has_comp: z.boolean(),
     pac_addrs_comp: z.string().optional(),
     pac_has_resp: z.boolean(),
     pac_resp_name: z.string().optional(), // Inicialmente opcional
@@ -94,4 +91,5 @@ const formSchema: ZodType<FormData> = z
       data.pac_resp_occupation = "";
     }
   });
+
 export default formSchema;
