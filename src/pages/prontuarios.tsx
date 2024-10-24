@@ -285,14 +285,6 @@ export default function ProntuariosPage() {
               />
               <Input
                 isDisabled
-                label="Ocupação"
-                labelPlacement="outside"
-                placeholder="Ocupação"
-                value={getValues("pac_resp_occupation") || ""}
-                onChange={() => null}
-              />
-              <Input
-                isDisabled
                 label="Telefone"
                 labelPlacement="outside"
                 placeholder="Telefone"
@@ -301,18 +293,27 @@ export default function ProntuariosPage() {
               />
               <Input
                 isDisabled
-                label="Educação"
-                labelPlacement="outside"
-                placeholder="Educação"
-                value={getValues("pac_resp_education") || ""}
-                onChange={() => null}
-              />
-              <Input
-                isDisabled
                 label="Email"
                 labelPlacement="outside"
                 placeholder="Email"
                 value={getValues("pac_resp_email") || ""}
+                onChange={() => null}
+              />
+              <Input
+                isDisabled
+                label="Ocupação"
+                labelPlacement="outside"
+                placeholder="Ocupação"
+                value={getValues("pac_resp_occupation") || ""}
+                onChange={() => null}
+              />
+
+              <Input
+                isDisabled
+                label="Educação"
+                labelPlacement="outside"
+                placeholder="Educação"
+                value={getValues("pac_resp_education") || ""}
                 onChange={() => null}
               />
             </BgCard>

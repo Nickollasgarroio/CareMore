@@ -43,10 +43,19 @@ export default function CadastroPage() {
 
   const registerWithMask = useHookFormMask(register);
   const [error, setError] = useState<string | null>(null);
+  const [hasResp, setHasResp] = useState(true);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure(); //declaração para uso do hook do modal
   const onSubmitSupabase = async (data: FormData) => {
-    // Enviar dados para o Supabase
+    console.log("Dados enviados:", data);
+    // Exibir os erros
+    console.log("Erros de validação:", errors);
+
+    if (Object.keys(errors).length > 0) {
+      console.log("Formulário inválido");
+      return; // Se houver erros, não enviar os dados
+    }
+
     const { error } = await supabase.from("pacientes").insert([
       {
         pac_name: data.pac_name,
@@ -78,13 +87,12 @@ export default function CadastroPage() {
       console.log(`Paciente Cadastrado com sucesso`);
     }
     onOpen();
-
-    // Exibir o modal independentemente do resultado, com mensagem de sucesso ou erro
-    // setModalVisible(true);
   };
+
   const handleDateChange = (value: DateValue | null) => {
     if (value) {
       const formattedDate = value.toString(); // Convert to string
+
       setValue("pac_birth_date", formattedDate);
     } else {
       setValue("pac_birth_date", ""); // Clear the value if null
@@ -110,13 +118,12 @@ export default function CadastroPage() {
   };
 
   const values = getValues();
-  const hasResp = watch("pac_has_resp");
 
   // Preencher os campos de endereço quando o hook retornar dados
 
   return (
     <DefaultLayout>
-      <form onSubmit={handleSubmit(onSubmitSupabase)} noValidate>
+      <form noValidate onSubmit={handleSubmit(onSubmitSupabase)}>
         <div className="flex flex-col gap-4 max-w-[400px] mx-auto">
           <BgCard className="flex flex-col gap-4">
             <Input
@@ -326,81 +333,64 @@ export default function CadastroPage() {
           <Spacer />
           <BgCard className="flex flex-col gap-4">
             <Checkbox
-              defaultSelected
-              onChange={() => {
-                setValue("pac_has_resp", !hasResp);
+              isSelected={hasResp} // Usa o valor do estado local
+              onChange={(event) => {
+                const isChecked = event.target.checked; // Obtém o valor booleano
+                setHasResp(isChecked); // Atualiza o estado local
+                setValue("pac_has_resp", isChecked); // Atualiza o valor no formulário
               }}
             >
               Paciente tem responsável
             </Checkbox>
 
-            <Controller
-              control={control}
-              name="pac_resp_name"
-              render={(field) => (
-                <Input
-                  {...field}
-                  errorMessage={errors.pac_resp_name?.message}
-                  isInvalid={errors.pac_resp_name ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
-                  label="Nome do Responsável"
-                  labelPlacement="outside"
-                  placeholder="Emilia Rodrigues"
-                  value={field.field.value || ""}
-                  {...register("pac_resp_name")}
-                />
-              )}
+            <Input
+              errorMessage={errors.pac_resp_name?.message}
+              isInvalid={errors.pac_resp_name ? true : false}
+              isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+              label="Nome do Responsável"
+              labelPlacement="outside"
+              placeholder="Emilia Rodrigues"
+              {...register("pac_resp_name")}
             />
 
-            <Controller
-              control={control}
-              name="pac_resp_whatsapp"
-              render={(field) => (
-                <Input
-                  {...field}
-                  errorMessage={errors.pac_resp_whatsapp?.message}
-                  isInvalid={errors.pac_resp_whatsapp ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
-                  label="Telefone do Responsável"
-                  labelPlacement="outside"
-                  placeholder="11 99999-9999"
-                  {...registerWithMask("pac_resp_whatsapp", "99 99999-9999")}
-                />
-              )}
+            <Input
+              errorMessage={errors.pac_resp_whatsapp?.message}
+              isInvalid={errors.pac_resp_whatsapp ? true : false}
+              isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+              label="Telefone do Responsável"
+              labelPlacement="outside"
+              placeholder="11 99999-9999"
+              {...registerWithMask("pac_resp_whatsapp", "99 99999-9999")}
             />
 
-            <Controller
-              control={control}
-              name="pac_resp_email"
-              render={(field) => (
-                <Input
-                  {...field}
-                  errorMessage={errors.pac_resp_email?.message}
-                  isInvalid={!!errors.pac_resp_email ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
-                  label="Email do Responsável"
-                  labelPlacement="outside"
-                  placeholder="johndean@example.com"
-                  type="email"
-                />
-              )}
+            <Input
+              errorMessage={errors.pac_resp_email?.message}
+              isInvalid={!!errors.pac_resp_email ? true : false}
+              isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+              label="Email do Responsável"
+              labelPlacement="outside"
+              placeholder="johndean@example.com"
+              type="email"
+              {...register("pac_resp_email")}
             />
 
-            <Controller
-              control={control}
-              name="pac_resp_occupation"
-              render={(field) => (
-                <Input
-                  {...field}
-                  errorMessage={errors.pac_resp_occupation?.message}
-                  isInvalid={errors.pac_resp_occupation ? true : false}
-                  isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
-                  label="Ocupação do Responsável"
-                  labelPlacement="outside"
-                  placeholder="Bancário"
-                  value={field.field.value || ""}
-                />
-              )}
+            <Input
+              errorMessage={errors.pac_resp_occupation?.message}
+              isInvalid={errors.pac_resp_occupation ? true : false}
+              isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+              label="Ocupação do Responsável"
+              labelPlacement="outside"
+              placeholder="Bancário"
+              {...register("pac_resp_occupation")}
+            />
+            <Input
+              errorMessage={errors.pac_resp_education?.message}
+              isInvalid={errors.pac_resp_education ? true : false}
+              isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
+              label="Escolaridade do Responsável"
+              labelPlacement="outside"
+              placeholder="Mestrado"
+              {...register("pac_resp_education")}
             />
           </BgCard>
           <Button className="mx-auto" color="primary" type="submit">
@@ -408,14 +398,14 @@ export default function CadastroPage() {
           </Button>{" "}
           <pre>{JSON.stringify(values, null, 2)}</pre>
           <CadastroModal
-            status={error ? "error" : "success"}
             isOpen={isOpen}
-            onOpenChange={onOpenChange}
             message={
               error
                 ? `Erro ao enviar dados erro ${error}`
                 : "Paciente cadastrado com Sucesso!"
             }
+            status={error ? "error" : "success"}
+            onOpenChange={onOpenChange}
           />
         </div>
       </form>
