@@ -18,6 +18,7 @@ import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { BgCard } from "@/components/bg-card";
+import { useHookFormMask } from "use-mask-input";
 
 // Função para calcular a idade do paciente
 const calcularIdadePaciente = (dataNascimento: string | Date): number => {
@@ -75,12 +76,39 @@ export default function ProntuariosPage() {
     defaultValues: {},
     mode: "onChange",
   });
+  const registerWithMask = useHookFormMask(register);
 
   const { dataTeste, loading, fetchData } = useFetchPacientes();
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  const [
+    initialData = {
+      pac_name: "",
+      pac_sex: "",
+      pac_whatsapp: "",
+      pac_cpf: "",
+      pac_birth_date: "",
+      pac_email: "",
+      pac_addrs_street_name: "",
+      pac_addrs_num: "",
+      pac_addrs_bairro: "",
+      pac_addrs_city: "",
+      pac_addrs_uf: "",
+      pac_addrs_zip: "",
+      pac_addrs_comp: "",
+      pac_has_resp: false,
+      pac_resp_name: "",
+      pac_resp_email: "",
+      pac_resp_whatsapp: "",
+      pac_resp_education: "",
+      pac_resp_occupation: "",
+      pac_id: "",
+    },
+    setInitialData,
+  ] = useState<FormData | null>(null);
 
   const handleSelectPaciente = async (pac_id: string) => {
     const { data: paciente, error } = await supabase
@@ -121,11 +149,16 @@ export default function ProntuariosPage() {
       };
 
       // Atualiza todos os campos do formulário
+      setInitialData(paciente); // Armazena dados originais
       Object.entries(fieldsToUpdate).forEach(([field, value]) => {
         setValue(field as keyof FormData, value, { shouldValidate: true });
       });
     }
   };
+  const handleEditing = () => {
+    setIsEditing(!isEditing);
+  };
+  const [isEditing, setIsEditing] = useState(true);
 
   return (
     <DefaultLayout>
@@ -170,8 +203,8 @@ export default function ProntuariosPage() {
                   name="pac_birth_date"
                   render={({ field }) => (
                     <DatePicker
-                      isDisabled
                       className="w-3/4"
+                      isDisabled={isEditing}
                       label="Data de Nascimento"
                       labelPlacement="outside"
                       value={field.value ? parseDate(field.value) : undefined}
@@ -180,8 +213,8 @@ export default function ProntuariosPage() {
                   )}
                 />
                 <Input
-                  isDisabled
                   className="w-1/4"
+                  isDisabled
                   label="Idade"
                   labelPlacement="outside"
                   placeholder="Idade"
@@ -196,23 +229,22 @@ export default function ProntuariosPage() {
                 />
               </div>
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="Sexo"
                 labelPlacement="outside"
                 placeholder="Sexo"
                 value={getValues("pac_sex") || ""}
-                onChange={() => null}
               />
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="Telefone"
                 labelPlacement="outside"
                 placeholder="Telefone"
-                value={getValues("pac_whatsapp") || ""}
-                onChange={() => null}
+                value={initialData?.pac_whatsapp || ""}
+                {...registerWithMask("pac_whatsapp", "99 99999-9999")}
               />
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="Email"
                 labelPlacement="outside"
                 placeholder="Email"
@@ -224,7 +256,7 @@ export default function ProntuariosPage() {
             <BgCard className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold">Endereço</h2>
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="CEP"
                 labelPlacement="outside"
                 placeholder="CEP"
@@ -233,17 +265,17 @@ export default function ProntuariosPage() {
               />
               <div className="flex gap-4">
                 <Input
-                  isDisabled
                   className="w-3/4"
+                  isDisabled={isEditing}
                   label="Endereço"
                   labelPlacement="outside"
                   placeholder="Endereço"
                   value={getValues("pac_addrs_street_name") || ""}
-                  onChange={() => null}
+                  onChange={() => setValue("pac_addrs_street_name", "")}
                 />
                 <Input
-                  isDisabled
                   className="w-1/4"
+                  isDisabled={isEditing}
                   label="Número"
                   labelPlacement="outside"
                   placeholder="Número"
@@ -253,8 +285,8 @@ export default function ProntuariosPage() {
               </div>
               <div className="flex gap-4">
                 <Input
-                  isDisabled
                   className="w-3/4"
+                  isDisabled={isEditing}
                   label="Bairro"
                   labelPlacement="outside"
                   placeholder="Bairro"
@@ -262,8 +294,8 @@ export default function ProntuariosPage() {
                   onChange={() => null}
                 />
                 <Input
-                  isDisabled
                   className="w-1/4"
+                  isDisabled={isEditing}
                   label="UF"
                   labelPlacement="outside"
                   placeholder="UF"
@@ -276,7 +308,7 @@ export default function ProntuariosPage() {
             <BgCard className="flex flex-col gap-4">
               <h2 className="text-xl font-semibold">Responsável</h2>
               <Input
-                
+                isDisabled={isEditing}
                 label="Nome Completo"
                 labelPlacement="outside"
                 placeholder="Responsável"
@@ -284,7 +316,7 @@ export default function ProntuariosPage() {
                 onChange={() => null}
               />
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="Telefone"
                 labelPlacement="outside"
                 placeholder="Telefone"
@@ -292,7 +324,7 @@ export default function ProntuariosPage() {
                 onChange={() => null}
               />
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="Email"
                 labelPlacement="outside"
                 placeholder="Email"
@@ -300,7 +332,7 @@ export default function ProntuariosPage() {
                 onChange={() => null}
               />
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="Ocupação"
                 labelPlacement="outside"
                 placeholder="Ocupação"
@@ -309,7 +341,7 @@ export default function ProntuariosPage() {
               />
 
               <Input
-                isDisabled
+                isDisabled={isEditing}
                 label="Educação"
                 labelPlacement="outside"
                 placeholder="Educação"
@@ -318,9 +350,19 @@ export default function ProntuariosPage() {
               />
             </BgCard>
           </div>
-          <Button className="w-fit mx-auto" color="primary" type="submit">
-            Enviar
-          </Button>
+          <div className="flex">
+            <Button className="w-fit mx-auto" color="primary" type="submit">
+              Enviar
+            </Button>
+            <Button
+              className="w-fit mx-auto"
+              color="primary"
+              onPress={handleEditing}
+            >
+              Editar
+            </Button>
+          </div>
+          <pre>{JSON.stringify(initialData, null, 2)}</pre>
         </div>
       </form>
     </DefaultLayout>

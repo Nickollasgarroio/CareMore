@@ -7,7 +7,9 @@ import DocsPage from "@/pages/docs";
 import PricingPage from "@/pages/pricing";
 import BlogPage from "@/pages/blog";
 import AboutPage from "@/pages/about";
-import CadastroPage from "@/pages/cadastro";
+import PatientCadastro from "@/pages/patient_cadastro";
+import UserLoginPage from "@/pages/user_login";
+import UserCadastroPage from "@/pages/user_cadastro";
 
 function App() {
   return (
@@ -18,8 +20,10 @@ function App() {
         <Route element={<PricingPage />} path="/pricing" />
         <Route element={<BlogPage />} path="/blog" />
         <Route element={<AboutPage />} path="/about" />
-        <Route element={<CadastroPage />} path="/cadastro" />
+        <Route element={<PatientCadastro />} path="/cadastro" />
         <Route element={<ProntuariosPage />} path="/prontuarios" />
+        <Route element={<UserLoginPage />} path="/user/login" />
+        <Route element={<UserCadastroPage />} path="/user/cadastro" />
       </Routes>
     </ThemeProvider>
   );

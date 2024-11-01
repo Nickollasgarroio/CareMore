@@ -22,7 +22,7 @@ import { BgCard } from "@/components/bg-card";
 import DefaultLayout from "@/layouts/default";
 import { CadastroModal } from "@/components/CadastroModal";
 
-export default function CadastroPage() {
+export default function PatientCadastro() {
   // const [error, setError] = React.useState<string | null>(null);
 
   const {
@@ -339,14 +339,13 @@ export default function CadastroPage() {
               name="pac_resp_name"
               render={(field) => (
                 <Input
-                errorMessage={errors.pac_resp_name?.message}
-                isInvalid={!!errors.pac_resp_name} // Use double negation to ensure boolean type
-                isRequired={hasResp} // Conditionally make the field required based on hasResp
-                label="Nome do Responsável"
-                labelPlacement="outside"
-                placeholder="Emilia Rodrigues"
-                {...field} // This includes value, onChange, onBlur, etc.
-                
+                  errorMessage={errors.pac_resp_name?.message}
+                  isInvalid={!!errors.pac_resp_name} // Use double negation to ensure boolean type
+                  isRequired={hasResp} // Conditionally make the field required based on hasResp
+                  label="Nome do Responsável"
+                  labelPlacement="outside"
+                  placeholder="Emilia Rodrigues"
+                  {...field} // This includes value, onChange, onBlur, etc.
                 />
               )}
             />
@@ -356,7 +355,6 @@ export default function CadastroPage() {
               name="pac_resp_whatsapp"
               render={() => (
                 <Input
-                  
                   errorMessage={errors.pac_resp_whatsapp?.message}
                   isInvalid={errors.pac_resp_whatsapp ? true : false}
                   isRequired={hasResp} // Torna o campo obrigatório se o checkbox estiver desmarcado
@@ -371,7 +369,7 @@ export default function CadastroPage() {
             <Controller
               control={control}
               name="pac_resp_email"
-              render={({field}) => (
+              render={({ field }) => (
                 <Input
                   {...field}
                   errorMessage={errors.pac_resp_email?.message}

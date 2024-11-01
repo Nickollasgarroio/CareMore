@@ -19,6 +19,11 @@ export default function IndexPage() {
               Cadastro
             </Button>
           </Link>
+          <Link href="/user/cadastro">
+            <Button color="primary" size="lg">
+              Log in
+            </Button>
+          </Link>
         </div>
       </section>
     </DefaultLayout>
