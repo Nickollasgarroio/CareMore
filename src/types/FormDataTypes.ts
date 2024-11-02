@@ -1,6 +1,6 @@
 // types/pacDataTypes.ts
 
-type FormData = {
+export type PacFormData = {
   pac_id?: string;
   pac_name: string;
   pac_sex: "Masculino" | "Feminino" | "Não Binário" | "Não informado";
@@ -23,4 +23,15 @@ type FormData = {
   pac_resp_occupation?: string;
 };
 
-export default FormData;
+export type UserFormData = {
+  user_id?: string;
+  user_name: string;
+  user_email: string;
+  user_email_confirmation:string;
+  user_password: string;
+  user_password_confirmation: string;
+  user_phone?: string;
+  user_birth_date?: string;
+  user_role: "admin" | "user";
+  user_especialidade: string;
+};

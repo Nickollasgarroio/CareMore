@@ -34,3 +34,11 @@ export const generos = [
   "Não Binário",
   "Não informado",
 ] as const;
+
+export const especialidades = [
+  "Fisioterapia",
+  "Fonoaudiologia",
+  "Medicina",
+  "Nutrição",
+  "Psicologia",
+];

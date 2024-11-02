@@ -2,9 +2,9 @@ import { z, ZodType } from "zod";
 
 import { isValidCPF } from "@/utils/cpfUtils";
 import { generos } from "@/pages/configs/cadastroConfigs";
-import FormData from "@/types/FormDataTypes";
+import {PacFormData} from "@/types/FormDataTypes";
 
-const formSchema: ZodType<FormData> = z
+const formSchema: ZodType<PacFormData> = z
   .object({
     pac_name: z.string().min(3, { message: "Nome é obrigatório" }),
     pac_sex: z.enum(generos, { message: "Campo obrigatório" }),

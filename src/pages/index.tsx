@@ -16,10 +16,10 @@ export default function IndexPage() {
           </Link>
           <Link href="/cadastro">
             <Button color="primary" size="lg">
-              Cadastro
+              Cadastro Pacientes
             </Button>
           </Link>
-          <Link href="/user/cadastro">
+          <Link href="/user/login">
             <Button color="primary" size="lg">
               Log in
             </Button>

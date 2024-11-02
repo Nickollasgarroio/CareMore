@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { useHookFormMask } from "use-mask-input";
 
-import FormData from "@/types/FormDataTypes";
+import { PacFormData } from "@/types/FormDataTypes";
 import { estadosUF, generos } from "@/pages/configs/cadastroConfigs";
 import formSchema from "@/schemas/formSchemas";
 import { supabase } from "@/supabaseClient";
@@ -33,7 +33,7 @@ export default function PatientCadastro() {
     control,
     getValues,
     watch, // Import this function
-  } = useForm<FormData>({
+  } = useForm<PacFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       pac_has_resp: true,
@@ -45,7 +45,7 @@ export default function PatientCadastro() {
   const [error, setError] = useState<string | null>(null);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure(); //declaração para uso do hook do modal
-  const onSubmitSupabase = async (data: FormData) => {
+  const onSubmitSupabase = async (data: PacFormData) => {
     // Enviar dados para o Supabase
     const { error } = await supabase.from("pacientes").insert([
       {
@@ -85,6 +85,7 @@ export default function PatientCadastro() {
   const handleDateChange = (value: DateValue | null) => {
     if (value) {
       const formattedDate = value.toString(); // Convert to string
+
       setValue("pac_birth_date", formattedDate);
     } else {
       setValue("pac_birth_date", ""); // Clear the value if null
@@ -116,7 +117,7 @@ export default function PatientCadastro() {
 
   return (
     <DefaultLayout>
-      <form onSubmit={handleSubmit(onSubmitSupabase)} noValidate>
+      <form noValidate onSubmit={handleSubmit(onSubmitSupabase)}>
         <div className="flex flex-col gap-4 max-w-[400px] mx-auto">
           <BgCard className="flex flex-col gap-4">
             <Input
@@ -404,14 +405,14 @@ export default function PatientCadastro() {
           </Button>{" "}
           <pre>{JSON.stringify(values, null, 2)}</pre>
           <CadastroModal
-            status={error ? "error" : "success"}
             isOpen={isOpen}
-            onOpenChange={onOpenChange}
             message={
               error
                 ? `Erro ao enviar dados erro ${error}`
                 : "Paciente cadastrado com Sucesso!"
             }
+            status={error ? "error" : "success"}
+            onOpenChange={onOpenChange}
           />
         </div>
       </form>
