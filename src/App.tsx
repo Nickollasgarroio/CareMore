@@ -10,6 +10,7 @@ import AboutPage from "@/pages/about";
 import PatientCadastro from "@/pages/patient_cadastro";
 import UserLoginPage from "@/pages/user_login";
 import UserCadastroPage from "@/pages/user_cadastro";
+import UserResetPasswordPage from "@/pages/user_resetpassword";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route element={<ProntuariosPage />} path="/prontuarios" />
         <Route element={<UserLoginPage />} path="/user/login" />
         <Route element={<UserCadastroPage />} path="/user/cadastro" />
+        <Route element={<UserResetPasswordPage />} path="/user/resetpassword" />
       </Routes>
     </ThemeProvider>
   );

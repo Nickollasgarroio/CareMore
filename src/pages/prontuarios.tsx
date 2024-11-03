@@ -12,7 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
 
-import FormData from "@/types/FormDataTypes";
+import { PacFormData } from "@/types/FormDataTypes";
 import formSchema from "@/schemas/formSchemas";
 import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
@@ -71,7 +71,7 @@ export default function ProntuariosPage() {
     setValue,
     control,
     getValues,
-  } = useForm<FormData>({
+  } = useForm<PacFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {},
     mode: "onChange",
@@ -151,7 +151,7 @@ export default function ProntuariosPage() {
       // Atualiza todos os campos do formulário
       setInitialData(paciente); // Armazena dados originais
       Object.entries(fieldsToUpdate).forEach(([field, value]) => {
-        setValue(field as keyof FormData, value, { shouldValidate: true });
+        setValue(field as keyof PacFormData, value, { shouldValidate: true });
       });
     }
   };

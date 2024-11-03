@@ -13,9 +13,7 @@ import UserFormSchema from "@/schemas/cadastroUserSchema";
 import { UserFormData } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
 
-import { supabase } from "@/supabaseClient";
-
-export default function UserCadastroPage() {
+export default function UserResetPasswordPage() {
   const {
     register,
     handleSubmit,
@@ -33,20 +31,7 @@ export default function UserCadastroPage() {
   const registerWithMask = useHookFormMask(register);
 
   const onSubmit = () => {
-    console.log(errors);
-  };
-  const handleSignUp = async (data: UserFormData) => {
-    const { email, password } = data;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) console.log(error.message);
-    else
-      console.log(
-        "Cadastro realizado com sucesso. Verifique seu email para confirmação!"
-      );
+    console.log("Enviado com sucesso: ", getValues());
   };
 
   return (
@@ -56,16 +41,15 @@ export default function UserCadastroPage() {
           <h1 className={title({ color: "blue", size: "lg" })}>
             Seja Bem-vindo(a)!
           </h1>
-          <h1 className={subtitle()}>Cadastro</h1>
+          <h1 className={subtitle()}>Redefinir Senha</h1>
         </div>
       </section>
       <div>
         <form
           className="flex flex-col gap-4 max-w-[400px] mx-auto"
-          onSubmit={handleSubmit(handleSignUp)}
+          onSubmit={handleSubmit(onSubmit)}
         >
-          <Spacer />
-
+          <p>Insira o email cadastrado para redefinir sua senha!</p>
           <BgCard className="flex flex-col gap-4 max-w-[400px]">
             <Input
               isRequired
@@ -76,36 +60,6 @@ export default function UserCadastroPage() {
               placeholder="julia@teste.com"
               type="email"
               {...register("email")}
-            />
-            <Input
-              isRequired
-              errorMessage={errors.email_confirmation?.message}
-              isInvalid={!!errors.email_confirmation}
-              label="Confirme Email"
-              labelPlacement="outside"
-              placeholder="julia@teste.com"
-              type="email"
-              {...register("email_confirmation")}
-            />
-            <Input
-              isRequired
-              errorMessage={errors.password?.message}
-              isInvalid={!!errors.password}
-              label="Senha"
-              labelPlacement="outside"
-              placeholder="Senha"
-              type="password"
-              {...register("password")}
-            />
-            <Input
-              isRequired
-              errorMessage={errors.password_confirmation?.message}
-              isInvalid={!!errors.password_confirmation}
-              label="Confirme a Senha"
-              labelPlacement="outside"
-              placeholder="Senha"
-              type="password"
-              {...register("password_confirmation")}
             />
           </BgCard>
           <Spacer />
@@ -120,6 +74,7 @@ export default function UserCadastroPage() {
               Enviar
             </Button>
           </div>
+          <div className="flex flex-row gap-4 mx-auto"></div>
         </form>
       </div>
     </DefaultLayout>

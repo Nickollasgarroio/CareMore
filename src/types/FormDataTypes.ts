@@ -24,14 +24,20 @@ export type PacFormData = {
 };
 
 export type UserFormData = {
-  user_id?: string;
-  user_name: string;
-  user_email: string;
-  user_email_confirmation:string;
-  user_password: string;
-  user_password_confirmation: string;
-  user_phone?: string;
-  user_birth_date?: string;
-  user_role: "admin" | "user";
-  user_especialidade: string;
+  id?: string;
+  name?: string;
+  email: string;
+  email_confirmation?: string;
+  password: string;
+  password_confirmation?: string;
+  phone?: string;
+  birth_date?: string;
+  role?: "admin" | "user";
+  especialidade?: string;
+};
+export type UserLoginData = {
+  name?: string;
+  email: string;
+  password: string;
+  role?: "admin" | "user";
 };
