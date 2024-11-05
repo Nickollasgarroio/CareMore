@@ -8,8 +8,8 @@ export default function IndexPage() {
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <title className={title()}>Opções</title>
-        <div className="flex flex-row gap-4 max-w-450px mt-24">
-          <Link href="/prontuarios">
+        <div className="flex gap-4 max-w-450px mt-24 grid">
+          <Link href="/user/prontuarios">
             <Button color="primary" size="lg">
               Prontuarios
             </Button>
@@ -22,6 +22,11 @@ export default function IndexPage() {
           <Link href="/user/login">
             <Button color="primary" size="lg">
               Log in
+            </Button>
+          </Link>
+          <Link href="/user/home">
+            <Button color="primary" size="lg">
+              Home Page
             </Button>
           </Link>
         </div>

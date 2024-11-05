@@ -1,28 +1,29 @@
-import { Spacer, Input, Button, Select, SelectItem } from "@nextui-org/react";
-import { Link as LinkNext } from "@nextui-org/react";
-import { Link } from "react-router-dom";
+import { Spacer, Input, Button, useDisclosure } from "@nextui-org/react";
+import { Link } from "@nextui-org/react";
+// import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useHookFormMask } from "use-mask-input";
-
-import { especialidades } from "./configs/cadastroConfigs";
+import { useState } from "react";
 
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
-import UserFormSchema from "@/schemas/cadastroUserSchema";
-import { UserFormData } from "@/types/FormDataTypes";
+import { UserFormSchema } from "@/schemas/cadastroUserSchema";
+import { UserSignUpFormData } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
-
+import { CadastroModal } from "@/components/CadastroModal";
 import { supabase } from "@/supabaseClient";
 
 export default function UserCadastroPage() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); //declaração para uso do hook do modal
+  const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
     getValues,
-  } = useForm<UserFormData>({
+  } = useForm<UserSignUpFormData>({
     resolver: zodResolver(UserFormSchema),
     mode: "onChange",
     defaultValues: {
@@ -35,18 +36,21 @@ export default function UserCadastroPage() {
   const onSubmit = () => {
     console.log(errors);
   };
-  const handleSignUp = async (data: UserFormData) => {
+  const handleSignUp = async (data: UserSignUpFormData) => {
     const { email, password } = data;
     const { error } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    if (error) console.log(error.message);
-    else
+    if (error) {
+      console.log(error.message);
+      setError(error.message);
+    } else
       console.log(
         "Cadastro realizado com sucesso. Verifique seu email para confirmação!"
       );
+    onOpen();
   };
 
   return (
@@ -65,7 +69,6 @@ export default function UserCadastroPage() {
           onSubmit={handleSubmit(handleSignUp)}
         >
           <Spacer />
-
           <BgCard className="flex flex-col gap-4 max-w-[400px]">
             <Input
               isRequired
@@ -111,7 +114,7 @@ export default function UserCadastroPage() {
           <Spacer />
 
           <div className="flex flex-row gap-4 mx-auto">
-            <Link to="/user/login">
+            <Link href="/user/login">
               <Button color="danger" variant="ghost">
                 Login
               </Button>
@@ -120,6 +123,17 @@ export default function UserCadastroPage() {
               Enviar
             </Button>
           </div>
+          <CadastroModal
+            isOpen={isOpen}
+            status={error ? "error" : "success"}
+            onOpenChange={onOpenChange}
+            message={
+              error
+                ? `Houve um problema ao fazer o cadastro:`
+                : "Cadastro realizado com sucesso!"
+            }
+            error={error ? error : ""}
+          />
         </form>
       </div>
     </DefaultLayout>

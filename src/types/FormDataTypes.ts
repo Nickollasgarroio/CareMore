@@ -23,21 +23,19 @@ export type PacFormData = {
   pac_resp_occupation?: string;
 };
 
-export type UserFormData = {
+export type UserSignUpFormData = {
   id?: string;
   name?: string;
   email: string;
-  email_confirmation?: string;
+  email_confirmation: string;
   password: string;
-  password_confirmation?: string;
+  password_confirmation: string;
   phone?: string;
   birth_date?: string;
   role?: "admin" | "user";
   especialidade?: string;
 };
 export type UserLoginData = {
-  name?: string;
   email: string;
   password: string;
-  role?: "admin" | "user";
 };

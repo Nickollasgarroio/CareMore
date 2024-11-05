@@ -4,13 +4,14 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useHookFormMask } from "use-mask-input";
+import { supabase } from "@/supabaseClient";
 
 import { especialidades } from "./configs/cadastroConfigs";
 
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
-import UserFormSchema from "@/schemas/cadastroUserSchema";
-import { UserFormData } from "@/types/FormDataTypes";
+import { UserFormSchema } from "@/schemas/cadastroUserSchema";
+import { UserSignUpFormData } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
 
 export default function UserResetPasswordPage() {
@@ -20,7 +21,7 @@ export default function UserResetPasswordPage() {
     formState: { errors },
     control,
     getValues,
-  } = useForm<UserFormData>({
+  } = useForm<UserSignUpFormData>({
     resolver: zodResolver(UserFormSchema),
     mode: "onChange",
     defaultValues: {
@@ -31,7 +32,17 @@ export default function UserResetPasswordPage() {
   const registerWithMask = useHookFormMask(register);
 
   const onSubmit = () => {
-    console.log("Enviado com sucesso: ", getValues());
+    console.log(errors);
+  };
+  const handleSignUp = async (data: UserSignUpFormData) => {
+    const { email, password } = data;
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) console.log(error.message);
+    else
+      console.log(
+        "Cadastro realizado com sucesso. Verifique seu email para confirmação!"
+      );
   };
 
   return (

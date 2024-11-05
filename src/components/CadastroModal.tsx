@@ -5,22 +5,23 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Code,
 } from "@nextui-org/react";
 
 interface Props {
   status: "success" | "error";
   message?: string;
-  error?: string;
   isOpen: boolean;
+  error?: string;
   onOpenChange: (open: boolean) => void;
 }
 
 export const CadastroModal: React.FC<Props> = ({
   isOpen,
   onOpenChange,
+  error,
   status = "error",
-  message,
-  error = "Erro Desconhecido, tente novamente mais tarde",
+  message = "Erro Desconhecido, tente novamente mais tarde",
 }) => {
   return (
     <>
@@ -32,14 +33,11 @@ export const CadastroModal: React.FC<Props> = ({
               <ModalHeader
                 className={`flex flex-row gap-1 ${status === "success" ? "text-primary" : "text-danger"}`}
               >
-                {/* <Chip
-                  className="mx-2"
-                  color={status === "success" ? "success" : "danger"}
-                /> */}
                 {status === "success" ? "Sucesso!" : "Erro"}
               </ModalHeader>
               <ModalBody>
-                <p>{status === "success" ? message : error}</p>
+                <p>{message}</p>
+                {error && <Code className="text-wrap">{error}</Code>}{" "}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="bordered" onPress={onClose}>

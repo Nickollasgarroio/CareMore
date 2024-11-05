@@ -1,30 +1,30 @@
-import { Spacer, Input, Button, Select, SelectItem } from "@nextui-org/react";
-import { Link as LinkNext } from "@nextui-org/react";
-import { Link } from "react-router-dom";
+import { Spacer, Input, Button, useDisclosure } from "@nextui-org/react";
+import { Link } from "@nextui-org/react";
+// import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useHookFormMask } from "use-mask-input";
+import { useState } from "react";
 
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
-import UserFormSchema from "@/schemas/cadastroUserSchema";
-import { UserFormData } from "@/types/FormDataTypes";
-import { BgCard } from "@/components/bg-card";
-
+import { UserSignInFormSchema } from "@/schemas/cadastroUserSchema";
+import { UserLoginData } from "@/types/FormDataTypes";
+import { CadastroModal } from "@/components/CadastroModal";
 import { supabase } from "@/supabaseClient";
+
 export default function UserLoginPage() {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); //declaração para uso do hook do modal
+  const [error, setError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    control,
-    getValues,
-  } = useForm<UserFormData>({
-    // resolver: zodResolver(UserFormSchema),
+  } = useForm<UserLoginData>({
+    resolver: zodResolver(UserSignInFormSchema),
     mode: "onChange",
-    defaultValues: {
-      role: "user",
-    },
+    defaultValues: {},
   });
 
   const registerWithMask = useHookFormMask(register);
@@ -32,15 +32,18 @@ export default function UserLoginPage() {
   const onSubmit = () => {
     console.log(errors);
   };
-  const handleSignIn = async (data: UserFormData) => {
+  const handleSignIn = async (data: UserLoginData) => {
     const { email, password } = data;
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) console.log(error.message);
-    else console.log("Logado com sucesso");
+    if (error) {
+      console.log(error.message);
+      setError(error.message);
+    } else console.log("Logado com sucesso");
+    onOpen();
   };
 
   return (
@@ -58,6 +61,8 @@ export default function UserLoginPage() {
           <Spacer />
           <Input
             isRequired
+            errorMessage={errors.email?.message}
+            isInvalid={!!errors.email}
             label="Email"
             labelPlacement="outside"
             placeholder="Email"
@@ -66,6 +71,8 @@ export default function UserLoginPage() {
           />
           <Input
             isRequired
+            errorMessage={errors.password?.message}
+            isInvalid={!!errors.password}
             label="Senha"
             labelPlacement="outside"
             placeholder="Senha"
@@ -74,21 +81,31 @@ export default function UserLoginPage() {
           />
           <Spacer />
           <div className="flex flex-row gap-4 mx-auto">
-            <Link to={"/user/cadastro"}>
-              <Button variant="ghost" color="primary">
+            <Link href={"/user/cadastro"}>
+              <Button color="primary" variant="ghost">
                 Cadastro
               </Button>
             </Link>
             <Button color="primary" type="submit">
               Login
             </Button>
-            <pre>{JSON.stringify(errors, null, 2)}</pre>
           </div>
           <div className="flex flex-row gap-4 mx-auto">
             <p>Esqueceu sua senha?</p>
-            <Link to={"/user/resetpassword"}>Redefinir Senha</Link>
+            <Link href={"/user/resetpassword"}>Redefinir Senha</Link>
           </div>
         </div>
+        <CadastroModal
+          error={error ? error : ""}
+          isOpen={isOpen}
+          message={
+            error
+              ? "Erro ao fazer o Login"
+              : "Seu login foi realizado com sucesso!"
+          }
+          status={error ? "error" : "success"}
+          onOpenChange={onOpenChange}
+        />
       </form>
     </DefaultLayout>
   );

@@ -1,7 +1,7 @@
 import { z, ZodType, ZodIssueCode } from "zod";
-import { UserFormData } from "@/types/FormDataTypes";
+import { UserSignUpFormData, UserLoginData } from "@/types/FormDataTypes";
 
-const UserFormSchema: ZodType<UserFormData> = z
+export const UserFormSchema: ZodType<UserSignUpFormData> = z
   .object({
     id: z.string().optional(),
     name: z
@@ -16,8 +16,7 @@ const UserFormSchema: ZodType<UserFormData> = z
     email_confirmation: z
       .string()
       .email({ message: "Confirmação de Email inválido" })
-      .max(50, { message: "Email deve ter no máximo 50 caracteres" })
-      .optional(),
+      .max(50, { message: "Email deve ter no máximo 50 caracteres" }),
     password: z
       .string()
       .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
@@ -33,8 +32,7 @@ const UserFormSchema: ZodType<UserFormData> = z
         message:
           "A senha deve conter pelo menos uma letra maiúscula, um número e um caractere especial",
       })
-      .max(20, { message: "A senha deve ter no máximo 20 caracteres" })
-      .optional(),
+      .max(20, { message: "A senha deve ter no máximo 20 caracteres" }),
     phone: z
       .string()
       .min(11, { message: "O Telefone deve ter 11 dígitos" })
@@ -61,4 +59,18 @@ const UserFormSchema: ZodType<UserFormData> = z
     }
   });
 
-export default UserFormSchema;
+export const UserSignInFormSchema: ZodType<UserLoginData> = z.object({
+  email: z
+    .string()
+    .email({ message: "Email inválido" })
+    .max(50, { message: "Email deve ter no máximo 50 caracteres" }),
+  password: z
+    .string()
+    .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
+    .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/, {
+      message:
+        "A senha deve conter pelo menos uma letra maiúscula, um número e um caractere especial",
+    })
+    .max(20, { message: "A senha deve ter no máximo 20 caracteres" }),
+  //TODO: Add Validation to especialidades list(config file)
+});
