@@ -3,7 +3,6 @@ import { Link } from "@nextui-org/react";
 // import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useHookFormMask } from "use-mask-input";
 import { useState } from "react";
 
 import DefaultLayout from "@/layouts/default";
@@ -26,8 +25,6 @@ export default function UserLoginPage() {
     mode: "onChange",
     defaultValues: {},
   });
-
-  const registerWithMask = useHookFormMask(register);
 
   const onSubmit = () => {
     console.log(errors);

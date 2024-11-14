@@ -29,6 +29,11 @@ export default function IndexPage() {
               Home Page
             </Button>
           </Link>
+          <Link href="/user/pacientes/evolucao">
+            <Button color="primary" size="lg">
+              Evolução Pacientes
+            </Button>
+          </Link>
         </div>
       </section>
     </DefaultLayout>

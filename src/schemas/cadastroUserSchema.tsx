@@ -1,13 +1,20 @@
 import { z, ZodType, ZodIssueCode } from "zod";
-import { UserSignUpFormData, UserLoginData } from "@/types/FormDataTypes";
+import {
+  UserSignUpFormData,
+  UserLoginData,
+  UserProfile,
+} from "@/types/FormDataTypes";
 
-export const UserFormSchema: ZodType<UserSignUpFormData> = z
+export const CreateUserSchema: ZodType<UserSignUpFormData> = z
   .object({
     id: z.string().optional(),
     name: z
       .string()
       .min(3, { message: "Nome é obrigatório" })
-      .max(50, { message: "Nome deve ter no máximo 50 caracteres" })
+      .max(50, { message: "Nome deve ter no máximo 50 caracteres" }),
+    sex: z
+      .string()
+      .min(3, { message: "O campo Sexo é obrigatório" })
       .optional(),
     email: z
       .string()
@@ -33,13 +40,6 @@ export const UserFormSchema: ZodType<UserSignUpFormData> = z
           "A senha deve conter pelo menos uma letra maiúscula, um número e um caractere especial",
       })
       .max(20, { message: "A senha deve ter no máximo 20 caracteres" }),
-    phone: z
-      .string()
-      .min(11, { message: "O Telefone deve ter 11 dígitos" })
-      .optional(),
-    birth_date: z.string().optional(),
-    role: z.enum(["user", "admin"]).optional(),
-    especialidade: z.string().optional(), //TODO: Add Validation to especialidades list(config file)
   })
   .superRefine((data, ctx) => {
     if (data.email !== data.email_confirmation) {
@@ -58,6 +58,33 @@ export const UserFormSchema: ZodType<UserSignUpFormData> = z
       });
     }
   });
+
+export const UserProfileSchema: ZodType<UserProfile> = z.object({
+  name: z
+    .string()
+    .min(3, { message: "O Nome deve ter no mínimo 3 caracteres" }),
+  last_name: z
+    .string()
+    .min(3, { message: "O Sobrenome deve ter no mínimo 3 caracteres" }),
+  sex: z.string(),
+  phone: z.string().min(11, { message: "O Telefone deve ter 11 dígitos" }),
+  birth_date: z.string(),
+  city: z.string().min(3, { message: "Nome da cidade inválido" }),
+  uf: z.string().max(2, { message: "UF inválida" }),
+  area_de_atuacao: z.string(),
+  bio: z.string().optional(),
+  about_me: z
+    .string()
+    .max(500, { message: "Máximo de 500 caracteres" })
+    .optional(),
+  title: z.string(),
+  publico_preferencial: z.string(),
+  instagram: z.string().optional(),
+  tiktok: z.string().optional(),
+  email_contato: z.string().optional(),
+  contato_whatsapp: z.string().optional(),
+  modalidade_atendimento: z.string(),
+});
 
 export const UserSignInFormSchema: ZodType<UserLoginData> = z.object({
   email: z

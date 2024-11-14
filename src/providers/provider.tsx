@@ -7,7 +7,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
 
   return (
     <NextUIProvider locale="pt-BR" navigate={navigate}>
-      <NextThemesProvider>{children}</NextThemesProvider>
+      <NextThemesProvider defaultTheme="light">{children}</NextThemesProvider>
     </NextUIProvider>
   );
 }

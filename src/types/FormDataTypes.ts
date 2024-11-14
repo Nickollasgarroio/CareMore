@@ -3,7 +3,7 @@
 export type PacFormData = {
   pac_id?: string;
   pac_name: string;
-  pac_sex: "Masculino" | "Feminino" | "Não Binário" | "Não informado";
+  pac_sex: string;
   pac_whatsapp: string;
   pac_cpf?: string;
   pac_birth_date: string;
@@ -24,16 +24,30 @@ export type PacFormData = {
 };
 
 export type UserSignUpFormData = {
-  id?: string;
-  name?: string;
   email: string;
   email_confirmation: string;
   password: string;
   password_confirmation: string;
-  phone?: string;
-  birth_date?: string;
   role?: "admin" | "user";
-  especialidade?: string;
+};
+export type UserProfile = {
+  name: string;
+  last_name: string;
+  sex: string;
+  phone: string;
+  birth_date: string;
+  city: string;
+  uf?: string;
+  bio?: string;
+  about_me?: string;
+  area_de_atuacao: string;
+  publico_preferencial: string;
+  title: string;
+  instagram?: string;
+  tiktok?: string;
+  contato_email?: string;
+  contato_whatsapp?: string;
+  modalidade_atendimento:string;
 };
 export type UserLoginData = {
   email: string;

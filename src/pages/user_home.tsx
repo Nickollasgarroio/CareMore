@@ -2,15 +2,18 @@ import { Card, CardBody, CardHeader, Link } from "@nextui-org/react";
 
 import { title, subtitle } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function UserHomePage() {
+  const { session, loading } = useAuth();
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-lg text-center justify-center">
           <h1 className={title({ color: "blue" })}>Página Inicial</h1>
-          <h1 className={subtitle()}>Olá, Nickollas!</h1>
+          <h1 className={subtitle()}>Olá!</h1>
         </div>
+        <div>{session?.user?.email}</div>
         <div className="w-[90%] max-w-[450px] grid grid-cols-2 gap-4">
           <Card isHoverable isPressable className="w-full">
             <CardHeader>

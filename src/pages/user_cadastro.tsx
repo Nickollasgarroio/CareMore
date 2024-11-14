@@ -1,56 +1,62 @@
+/* eslint-disable no-console */
 import { Spacer, Input, Button, useDisclosure } from "@nextui-org/react";
 import { Link } from "@nextui-org/react";
-// import { Link } from "react-router-dom";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useHookFormMask } from "use-mask-input";
 import { useState } from "react";
 
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
-import { UserFormSchema } from "@/schemas/cadastroUserSchema";
+import { CreateUserSchema } from "@/schemas/cadastroUserSchema";
 import { UserSignUpFormData } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
 import { CadastroModal } from "@/components/CadastroModal";
 import { supabase } from "@/supabaseClient";
 
 export default function UserCadastroPage() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure(); //declaração para uso do hook do modal
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
-    control,
-    getValues,
   } = useForm<UserSignUpFormData>({
-    resolver: zodResolver(UserFormSchema),
+    resolver: zodResolver(CreateUserSchema),
     mode: "onChange",
     defaultValues: {
       role: "user",
     },
   });
 
-  const registerWithMask = useHookFormMask(register);
-
-  const onSubmit = () => {
-    console.log(errors);
-  };
   const handleSignUp = async (data: UserSignUpFormData) => {
     const { email, password } = data;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
 
-    if (error) {
-      console.log(error.message);
-      setError(error.message);
-    } else
-      console.log(
-        "Cadastro realizado com sucesso. Verifique seu email para confirmação!"
-      );
-    onOpen();
+    // Primeiro, crie o usuário no Supabase Auth
+    const { error: signUpError, data: signUpData } = await supabase.auth.signUp(
+      {
+        email,
+        password,
+      }
+    );
+
+    if (signUpError) {
+      console.log(signUpError.message);
+      setError(signUpError.message);
+      onOpen();
+
+      return;
+    }
+
+    // Verifique se o usuário foi criado e obtenha o ID
+    const userId = signUpData.user?.id;
+
+    if (!userId) {
+      setError("Erro ao obter o ID do usuário.");
+      onOpen();
+
+      return;
+    }
   };
 
   return (
@@ -112,29 +118,30 @@ export default function UserCadastroPage() {
             />
           </BgCard>
           <Spacer />
-
           <div className="flex flex-row gap-4 mx-auto">
             <Link href="/user/login">
-              <Button color="danger" variant="ghost">
-                Login
-              </Button>
+              <Button color="danger">Login</Button>
             </Link>
-            <Button color="primary" type="submit">
-              Enviar
+            <Button
+              color="primary"
+              type="submit" // Envolvemos `handleSubmit` em uma função anônima
+            >
+              Continuar
             </Button>
           </div>
-          <CadastroModal
-            isOpen={isOpen}
-            status={error ? "error" : "success"}
-            onOpenChange={onOpenChange}
-            message={
-              error
-                ? `Houve um problema ao fazer o cadastro:`
-                : "Cadastro realizado com sucesso!"
-            }
-            error={error ? error : ""}
-          />
         </form>
+
+        <CadastroModal
+          error={error ? error : ""}
+          isOpen={isOpen}
+          message={
+            error
+              ? `Houve um problema ao fazer o cadastro:`
+              : "Cadastro realizado com sucesso!"
+          }
+          status={error ? "error" : "success"}
+          onOpenChange={onOpenChange}
+        />
       </div>
     </DefaultLayout>
   );

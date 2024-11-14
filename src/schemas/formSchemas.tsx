@@ -1,8 +1,8 @@
 import { z, ZodType } from "zod";
 
 import { isValidCPF } from "@/utils/cpfUtils";
-import { generos } from "@/pages/configs/cadastroConfigs";
-import {PacFormData} from "@/types/FormDataTypes";
+import { generos } from "@/config/cadastroConfigs";
+import { PacFormData } from "@/types/FormDataTypes";
 
 const formSchema: ZodType<PacFormData> = z
   .object({
@@ -34,7 +34,10 @@ const formSchema: ZodType<PacFormData> = z
     pac_addrs_comp: z.string().optional(),
     pac_has_resp: z.boolean(), // This is a boolean, no need to handle it like a string
     pac_resp_name: z.string().optional(),
-    pac_resp_email: z.string().email("Email do responsável inválido").optional(),
+    pac_resp_email: z
+      .string()
+      .email("Email do responsável inválido")
+      .optional(),
     pac_resp_whatsapp: z.string().optional(),
     pac_resp_education: z.string().optional(),
     pac_resp_occupation: z.string().optional(),

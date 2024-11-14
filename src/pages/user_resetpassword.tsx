@@ -6,11 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useHookFormMask } from "use-mask-input";
 import { supabase } from "@/supabaseClient";
 
-import { especialidades } from "./configs/cadastroConfigs";
+import { especialidades } from "../config/cadastroConfigs";
 
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
-import { UserFormSchema } from "@/schemas/cadastroUserSchema";
+import { UserSignInFormSchema } from "@/schemas/cadastroUserSchema";
 import { UserSignUpFormData } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
 
@@ -22,7 +22,7 @@ export default function UserResetPasswordPage() {
     control,
     getValues,
   } = useForm<UserSignUpFormData>({
-    resolver: zodResolver(UserFormSchema),
+    resolver: zodResolver(UserSignInFormSchema),
     mode: "onChange",
     defaultValues: {
       role: "user",

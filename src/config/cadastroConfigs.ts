@@ -32,8 +32,9 @@ export const generos = [
   "Masculino",
   "Feminino",
   "Não Binário",
-  "Não informado",
-] as const;
+  "Transgênero",
+  "Prefiro não informar",
+];
 
 export const especialidades = [
   "Fisioterapia",
@@ -42,3 +43,13 @@ export const especialidades = [
   "Nutrição",
   "Psicologia",
 ];
+export const publico_preferencial = ["Todos", "Adultos", "Crianças", "Idosos"];
+
+export const titulosProfissionais = [
+  "Nenhum",
+  "Dr(a)",
+  "Mestre(a)",
+  "Pósdoutor(a)",
+];
+
+export const modalidade_atendimento = ["Todos", "Online", "Presencial"];

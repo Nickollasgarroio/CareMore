@@ -15,7 +15,7 @@ import { DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { useHookFormMask } from "use-mask-input";
 
 import { PacFormData } from "@/types/FormDataTypes";
-import { estadosUF, generos } from "@/pages/configs/cadastroConfigs";
+import { estadosUF, generos } from "@/config/cadastroConfigs";
 import formSchema from "@/schemas/formSchemas";
 import { supabase } from "@/supabaseClient";
 import { BgCard } from "@/components/bg-card";

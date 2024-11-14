@@ -11,6 +11,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
+import { useHookFormMask } from "use-mask-input";
 
 import { PacFormData } from "@/types/FormDataTypes";
 import formSchema from "@/schemas/formSchemas";
@@ -18,7 +19,9 @@ import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
 import { title } from "@/components/primitives";
 import { BgCard } from "@/components/bg-card";
-import { useHookFormMask } from "use-mask-input";
+import { BackButton } from "@/components/BackButton";
+
+// import goBack from "@/assets/svg/goBack.svg";
 
 // Função para calcular a idade do paciente
 const calcularIdadePaciente = (dataNascimento: string | Date): number => {
@@ -108,7 +111,7 @@ export default function ProntuariosPage() {
       pac_id: "",
     },
     setInitialData,
-  ] = useState<FormData | null>(null);
+  ] = useState<PacFormData | null>(null);
 
   const handleSelectPaciente = async (pac_id: string) => {
     const { data: paciente, error } = await supabase
@@ -164,7 +167,10 @@ export default function ProntuariosPage() {
     <DefaultLayout>
       <form action="">
         <div className="w-[400px] flex flex-col gap-4 mx-auto">
-          <h1 className={title()}>Prontuário</h1>
+          <div className="flex flex-row gap-16">
+            <BackButton />
+            <h1 className={title({ color: "blue" })}>Prontuários</h1>
+          </div>
           <Spacer />
           <div className="flex flex-col gap-4">
             <BgCard className="flex flex-col gap-4">
@@ -213,8 +219,8 @@ export default function ProntuariosPage() {
                   )}
                 />
                 <Input
-                  className="w-1/4"
                   isDisabled
+                  className="w-1/4"
                   label="Idade"
                   labelPlacement="outside"
                   placeholder="Idade"
