@@ -19,7 +19,7 @@ export default function IndexPage() {
               Cadastro Pacientes
             </Button>
           </Link>
-          <Link href="/user/login">
+          <Link href="/login">
             <Button color="primary" size="lg">
               Log in
             </Button>
@@ -32,6 +32,11 @@ export default function IndexPage() {
           <Link href="/user/pacientes/evolucao">
             <Button color="primary" size="lg">
               Evolução Pacientes
+            </Button>
+          </Link>
+          <Link href="/user/profile/create">
+            <Button color="primary" size="lg">
+              Criar Perfil
             </Button>
           </Link>
         </div>

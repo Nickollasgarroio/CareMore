@@ -7,8 +7,10 @@ import {
 } from "@nextui-org/react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "@/providers/AuthProvider";
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
 import { UserProfileSchema } from "@/schemas/cadastroUserSchema";
@@ -30,11 +32,22 @@ export default function UserProfileCreatePage() {
 
   const steps = ["pessoal", "localidade", "profissional", "contato"];
   const currentStepIndex = steps.indexOf(currentPage);
+  const { session, loading } = useAuth();
+  const navigate = useNavigate(); // Hook do React Router para redirecionamento
+
+  // Redireciona para a página de login se o usuário não estiver logado
+  useEffect(() => {
+    if (!loading && !session) {
+      navigate("/login"); // Substitua "/login" pela rota da sua página de login
+    }
+  }, [loading, session, navigate]);
 
   const methods = useForm<UserProfile>({
     resolver: zodResolver(UserProfileSchema),
     mode: "onChange",
-    defaultValues: {},
+    defaultValues: {
+      id: session?.user.id || "", // Preenche o valor de "id" automaticamente se o usuário estiver logado
+    },
   });
 
   const {
@@ -43,6 +56,7 @@ export default function UserProfileCreatePage() {
     formState: { errors },
     watch,
     control,
+    reset,
   } = methods;
 
   const onSubmitSupabase = async (data: UserProfile) => {
@@ -63,6 +77,7 @@ export default function UserProfileCreatePage() {
     } else {
       // Enviar o formulário na última etapa
       handleSubmit(onSubmitSupabase)();
+      console.log(JSON.stringify(errors, null, 2));
     }
   };
 
@@ -72,6 +87,14 @@ export default function UserProfileCreatePage() {
       setCurrentPage(steps[currentStepIndex - 1]);
     }
   };
+
+  useEffect(() => {
+    if (session && session.user.id) {
+      reset({
+        id: session.user.id, // Atualiza o valor de "id" com o ID do usuário logado
+      });
+    }
+  }, [session, reset]);
 
   // Função para renderizar o componente correto de acordo com a página atual
   const renderStepComponent = () => {
@@ -114,6 +137,7 @@ export default function UserProfileCreatePage() {
         </div>
       </section>
       <div>
+        <div>{session?.user.email}</div>
         <FormProvider {...methods}>
           <form
             className="flex flex-col gap-4 max-w-[400px] mx-auto"
@@ -162,7 +186,6 @@ export default function UserProfileCreatePage() {
             </div>
           </form>
         </FormProvider>
-        {/* <pre>{JSON.stringify(valores, null, 2)}</pre> */}
         <CadastroModal
           error={error ? error : ""}
           isOpen={isOpen}
@@ -174,6 +197,8 @@ export default function UserProfileCreatePage() {
           status={error ? "error" : "success"}
           onOpenChange={onOpenChange}
         />
+        <pre>{JSON.stringify(valores, null, 2)}</pre>
+        {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
       </div>
     </DefaultLayout>
   );

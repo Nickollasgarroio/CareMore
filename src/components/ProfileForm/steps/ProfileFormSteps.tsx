@@ -271,7 +271,7 @@ export function ContactInfoStep({ register, errors }: ContactInfoStepProps) {
         label="Email Contato"
         labelPlacement="outside"
         placeholder="@juliaalves"
-        type="string"
+        type="email"
         {...register("contato_email")}
       />
       <Input

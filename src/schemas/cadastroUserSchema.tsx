@@ -8,14 +8,6 @@ import {
 export const CreateUserSchema: ZodType<UserSignUpFormData> = z
   .object({
     id: z.string().optional(),
-    name: z
-      .string()
-      .min(3, { message: "Nome é obrigatório" })
-      .max(50, { message: "Nome deve ter no máximo 50 caracteres" }),
-    sex: z
-      .string()
-      .min(3, { message: "O campo Sexo é obrigatório" })
-      .optional(),
     email: z
       .string()
       .email({ message: "Email inválido" })
@@ -60,6 +52,7 @@ export const CreateUserSchema: ZodType<UserSignUpFormData> = z
   });
 
 export const UserProfileSchema: ZodType<UserProfile> = z.object({
+  id: z.string(),
   name: z
     .string()
     .min(3, { message: "O Nome deve ter no mínimo 3 caracteres" }),
@@ -81,7 +74,7 @@ export const UserProfileSchema: ZodType<UserProfile> = z.object({
   publico_preferencial: z.string(),
   instagram: z.string().optional(),
   tiktok: z.string().optional(),
-  email_contato: z.string().optional(),
+  email_contato: z.string().email("Email inválido").optional(),
   contato_whatsapp: z.string().optional(),
   modalidade_atendimento: z.string(),
 });

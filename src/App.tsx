@@ -29,7 +29,7 @@ function App() {
           <Route element={<AboutPage />} path="/about" />
           <Route element={<PatientCadastro />} path="/cadastro" />
           <Route element={<ProntuariosPage />} path="user/prontuarios" />
-          <Route element={<UserLoginPage />} path="/user/login" />
+          <Route element={<UserLoginPage />} path="/login" />
           <Route element={<UserCadastroPage />} path="/user/cadastro" />
           <Route
             element={<UserResetPasswordPage />}

@@ -119,7 +119,7 @@ export default function UserCadastroPage() {
           </BgCard>
           <Spacer />
           <div className="flex flex-row gap-4 mx-auto">
-            <Link href="/user/login">
+            <Link href="/login">
               <Button color="danger">Login</Button>
             </Link>
             <Button
@@ -142,6 +142,7 @@ export default function UserCadastroPage() {
           status={error ? "error" : "success"}
           onOpenChange={onOpenChange}
         />
+        {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
       </div>
     </DefaultLayout>
   );

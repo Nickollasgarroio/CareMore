@@ -31,6 +31,7 @@ export type UserSignUpFormData = {
   role?: "admin" | "user";
 };
 export type UserProfile = {
+  id : string;
   name: string;
   last_name: string;
   sex: string;
