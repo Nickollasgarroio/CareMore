@@ -1,17 +1,22 @@
-/* eslint-disable no-console */
 import { useState, useEffect } from "react";
 import { Autocomplete, AutocompleteItem } from "@nextui-org/react";
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import {
+  Controller,
+  FieldErrors,
+  Control,
+  UseFormSetValue,
+} from "react-hook-form";
 
 import { UserProfile } from "@/types/FormDataTypes";
 
 interface CitySelectProps {
   uf: string;
-  register: UseFormRegister<UserProfile>;
+  control: Control<UserProfile>;
   errors: FieldErrors<UserProfile>;
+  setValue: UseFormSetValue<UserProfile>; // Added setValue prop
 }
 
-export function CitySelect({ uf, register, errors }: CitySelectProps) {
+export function CitySelect({ uf, control, errors, setValue }: CitySelectProps) {
   const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,28 +49,37 @@ export function CitySelect({ uf, register, errors }: CitySelectProps) {
   }, [uf]);
 
   return (
-    <>
-      <Autocomplete
-        isRequired
-        errorMessage={errors.city?.message || error}
-        isInvalid={!!errors.city || !!error}
-        label="Cidade"
-        labelPlacement="outside"
-        placeholder={loading ? "Carregando..." : "Selecione uma cidade"}
-        {...register("city")}
-      >
-        {!loading && cities.length > 0 ? (
-          cities.map((city) => (
-            <AutocompleteItem key={city} value={city}>
-              {city}
+    <Controller
+      control={control}
+      name="city"
+      render={({ field }) => (
+        <Autocomplete
+          isRequired
+          errorMessage={errors.city?.message || error}
+          isClearable={false}
+          isInvalid={!!errors.city || !!error}
+          label="Cidade"
+          labelPlacement="outside"
+          placeholder={loading ? "Carregando..." : "Selecione uma cidade"}
+          selectedKey={field.value}
+          onSelectionChange={(value) => {
+            // Use setValue to immediately update the form state
+            setValue("city", value as string, { shouldValidate: true });
+          }}
+        >
+          {!loading && cities.length > 0 ? (
+            cities.map((city) => (
+              <AutocompleteItem key={city} value={city}>
+                {city}
+              </AutocompleteItem>
+            ))
+          ) : (
+            <AutocompleteItem key={"empty"} value={""}>
+              Nenhuma cidade disponível
             </AutocompleteItem>
-          ))
-        ) : (
-          <AutocompleteItem key={"empty"} value={""}>
-            Nenhuma cidade disponível
-          </AutocompleteItem>
-        )}
-      </Autocomplete>
-    </>
+          )}
+        </Autocomplete>
+      )}
+    />
   );
 }

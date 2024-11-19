@@ -14,11 +14,11 @@ const Logout: React.FC = () => {
     // Função de logout com atraso de 2 segundos
     const logout = async () => {
       // Espera 2 segundos antes de continuar
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       // Executa o logout
       await supabase.auth.signOut();
       // Redireciona para a página de login
-      // navigate("/login");
+      navigate("/login");
     };
 
     logout();

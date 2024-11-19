@@ -31,7 +31,7 @@ export type UserSignUpFormData = {
   role?: "admin" | "user";
 };
 export type UserProfile = {
-  id : string;
+  id: string;
   name: string;
   last_name: string;
   sex: string;
@@ -48,7 +48,7 @@ export type UserProfile = {
   tiktok?: string;
   contato_email?: string;
   contato_whatsapp?: string;
-  modalidade_atendimento:string;
+  modalidade_atendimento: string;
 };
 export type UserLoginData = {
   email: string;

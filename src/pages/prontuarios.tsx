@@ -17,7 +17,7 @@ import { PacFormData } from "@/types/FormDataTypes";
 import formSchema from "@/schemas/formSchemas";
 import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
-import { title } from "@/components/primitives";
+import { title, subtitle } from "@/components/primitives";
 import { BgCard } from "@/components/bg-card";
 import { BackButton } from "@/components/BackButton";
 
@@ -167,9 +167,12 @@ export default function ProntuariosPage() {
     <DefaultLayout>
       <form action="">
         <div className="w-[400px] flex flex-col gap-4 mx-auto">
-          <div className="flex flex-row gap-16">
-            <BackButton />
-            <h1 className={title({ color: "blue" })}>Prontuários</h1>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-row gap-16">
+              <BackButton />
+              <h1 className={title({ color: "blue" })}>Prontuários</h1>
+            </div>
+            <h1 className={subtitle()}>Cadastro</h1>
           </div>
           <Spacer />
           <div className="flex flex-col gap-4">

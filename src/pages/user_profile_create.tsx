@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/providers/AuthProvider";
 import DefaultLayout from "@/layouts/default";
-import { title, subtitle } from "@/components/primitives";
 import { UserProfileSchema } from "@/schemas/cadastroUserSchema";
 import { UserProfile } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
@@ -24,21 +23,23 @@ import {
   ContactInfoStep,
   LocalidadeInfoStep,
 } from "@/components/ProfileForm/steps/ProfileFormSteps";
+import { BackButton } from "@/components/BackButton";
 
 export default function UserProfileCreatePage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<string>("pessoal");
+  const [profileId, setProfileId] = useState<string | null>(null);
 
   const steps = ["pessoal", "localidade", "profissional", "contato"];
   const currentStepIndex = steps.indexOf(currentPage);
   const { session, loading } = useAuth();
-  const navigate = useNavigate(); // Hook do React Router para redirecionamento
+  const navigate = useNavigate();
 
   // Redireciona para a página de login se o usuário não estiver logado
   useEffect(() => {
     if (!loading && !session) {
-      navigate("/login"); // Substitua "/login" pela rota da sua página de login
+      navigate("/login");
     }
   }, [loading, session, navigate]);
 
@@ -57,46 +58,79 @@ export default function UserProfileCreatePage() {
     watch,
     control,
     reset,
+    setValue,
   } = methods;
 
+  // Função para buscar dados do usuário no Supabase ao carregar a página
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (session?.user.id) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Erro ao buscar perfil:", error.message);
+          // Se não encontrar perfil ou ocorrer erro, reseta o formulário com o id apenas.
+          reset({ id: session.user.id });
+        } else if (data) {
+          // Se encontrar o perfil, reseta o formulário com os dados do perfil
+          reset(data);
+          setProfileId(data.id); // Armazena o ID do perfil encontrado
+        } else {
+          // Se não encontrar dados, ainda assim preenche o id do usuário no formulário
+          reset({ id: session.user.id });
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [session, reset]);
+
+  useEffect(() => {
+    console.log("Erros do formulário:", errors);
+  }, [errors]);
   const onSubmitSupabase = async (data: UserProfile) => {
-    const { error } = await supabase.from("profiles").insert([data]);
+    if (profileId) {
+      // Atualiza os dados existentes
+      const { error } = await supabase
+        .from("profiles")
+        .update(data)
+        .eq("id", profileId);
 
-    if (error) setError(error.message);
-    else onOpen();
+      if (error) {
+        setError(error.message);
+      } else {
+        onOpen();
+      }
+    } else {
+      // Cria um novo registro se o perfil não existir
+      const { error } = await supabase.from("profiles").insert([data]);
+
+      if (error) {
+        setError(error.message);
+      } else {
+        onOpen();
+      }
+    }
   };
 
-  const testSubmit = (data: UserProfile) => {
-    console.log(data);
-  };
-
-  // Função para avançar para a próxima etapa
   const handleNextStep = () => {
     if (currentStepIndex < steps.length - 1) {
       setCurrentPage(steps[currentStepIndex + 1]);
     } else {
-      // Enviar o formulário na última etapa
       handleSubmit(onSubmitSupabase)();
-      console.log(JSON.stringify(errors, null, 2));
     }
   };
 
-  // Função para voltar para a etapa anterior
   const handlePreviousStep = () => {
     if (currentStepIndex > 0) {
       setCurrentPage(steps[currentStepIndex - 1]);
     }
   };
 
-  useEffect(() => {
-    if (session && session.user.id) {
-      reset({
-        id: session.user.id, // Atualiza o valor de "id" com o ID do usuário logado
-      });
-    }
-  }, [session, reset]);
-
-  // Função para renderizar o componente correto de acordo com a página atual
   const renderStepComponent = () => {
     switch (currentPage) {
       case "pessoal":
@@ -110,34 +144,43 @@ export default function UserProfileCreatePage() {
       case "localidade":
         return (
           <LocalidadeInfoStep
+            control={control}
             errors={errors}
             register={register}
+            setValue={setValue}
             watch={watch}
           />
         );
       case "profissional":
-        return <ProfessionalInfoStep errors={errors} register={register} />;
+        return (
+          <ProfessionalInfoStep
+            control={control}
+            errors={errors}
+            register={register}
+          />
+        );
       case "contato":
-        return <ContactInfoStep errors={errors} register={register} />;
+        return (
+          <ContactInfoStep
+            control={control}
+            errors={errors}
+            register={register}
+          />
+        );
       default:
         return null;
     }
   };
-
   const valores = watch();
 
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-lg text-center justify-center">
-          <h1 className={title({ color: "blue", size: "lg" })}>
-            Seja Bem-vindo(a)!
-          </h1>
-          <h1 className={subtitle()}>Cadastro</h1>
+          <BackButton subtitulo="Editar" titulo="Perfil Profissional" />
         </div>
       </section>
       <div>
-        <div>{session?.user.email}</div>
         <FormProvider {...methods}>
           <form
             className="flex flex-col gap-4 max-w-[400px] mx-auto"
@@ -198,7 +241,6 @@ export default function UserProfileCreatePage() {
           onOpenChange={onOpenChange}
         />
         <pre>{JSON.stringify(valores, null, 2)}</pre>
-        {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
       </div>
     </DefaultLayout>
   );
