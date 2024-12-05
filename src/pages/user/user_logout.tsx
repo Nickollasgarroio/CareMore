@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../../supabaseClient";
 import DefaultLayout from "@/layouts/default";
 
 import { Spinner } from "@nextui-org/react";

@@ -3,6 +3,7 @@ import {
   UserSignUpFormData,
   UserLoginData,
   UserProfile,
+  UserResetPasswordData,
 } from "@/types/FormDataTypes";
 
 export const CreateUserSchema: ZodType<UserSignUpFormData> = z
@@ -94,3 +95,21 @@ export const UserSignInFormSchema: ZodType<UserLoginData> = z.object({
     .max(20, { message: "A senha deve ter no máximo 20 caracteres" }),
   //TODO: Add Validation to especialidades list(config file)
 });
+
+export const UserResetPasswordSchema: ZodType<UserResetPasswordData> = z.object(
+  {
+    email: z
+      .string()
+      .email({ message: "Email inválido" })
+      .max(50, { message: "Email deve ter no máximo 50 caracteres" }),
+    password: z
+      .string()
+      .min(8, { message: "A senha deve ter no mínimo 8 caracteres" })
+      .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/, {
+        message:
+          "A senha deve conter pelo menos uma letra maiúscula, um número e um caractere especial",
+      })
+      .max(20, { message: "A senha deve ter no máximo 20 caracteres" })
+      .optional(),
+  }
+);

@@ -3,7 +3,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-import CadastroPage from "@/pages/patient_cadastro"; // Ajuste o caminho conforme necessário
+import CadastroPage from "@/pages/patient/patient_cadastro"; // Ajuste o caminho conforme necessário
 
 // Mock do cliente Supabase
 jest.mock("@/supabaseClient", () => ({

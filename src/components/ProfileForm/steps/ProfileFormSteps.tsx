@@ -168,6 +168,7 @@ export function LocalidadeInfoStep({
       </Select>
 
       <CitySelect
+        name="city"
         control={control}
         errors={errors}
         setValue={setValue}
@@ -360,17 +361,16 @@ export function ContactInfoStep({
         control={control}
         name="contato_whatsapp"
         render={({ field }) => (
-          <Tooltip content={`esse dado exibido no seu perfil profissional`}>
-            <Input
-              errorMessage={errors.contato_whatsapp?.message}
-              isInvalid={!!errors.contato_whatsapp}
-              label="WhatsApp"
-              labelPlacement="outside"
-              placeholder="11 99999-9999"
-              {...registerWithMask("contato_whatsapp", "99 99999-9999")}
-              onChange={(e) => field.onChange(e.target.value || "")}
-            />
-          </Tooltip>
+          <Input
+            errorMessage={errors.contato_whatsapp?.message}
+            isInvalid={!!errors.contato_whatsapp}
+            description="Esse dado será exibido no seu perfil profissional"
+            label="WhatsApp"
+            labelPlacement="outside"
+            placeholder="11 99999-9999"
+            {...registerWithMask("contato_whatsapp", "99 99999-9999")}
+            onChange={(e) => field.onChange(e.target.value || "")}
+          />
         )}
       />
       <Divider />

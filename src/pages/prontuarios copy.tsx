@@ -89,35 +89,35 @@ export default function ProntuariosPage() {
 
   const [
     initialData = {
-      pac_name: "",
-      pac_sex: "",
-      pac_whatsapp: "",
-      pac_cpf: "",
-      pac_birth_date: "",
-      pac_email: "",
-      pac_addrs_street_name: "",
-      pac_addrs_num: "",
-      pac_addrs_bairro: "",
-      pac_addrs_city: "",
-      pac_addrs_uf: "",
-      pac_addrs_zip: "",
-      pac_addrs_comp: "",
+      name: "",
+      sex: "",
+      whatsapp: "",
+      cpf: "",
+      birth_date: "",
+      email: "",
+      addrs_street_name: "",
+      addrs_num: "",
+      addrs_bairro: "",
+      addrs_city: "",
+      addrs_uf: "",
+      addrs_zip: "",
+      addrs_comp: "",
       pac_has_resp: false,
-      pac_resp_name: "",
-      pac_resp_email: "",
-      pac_resp_whatsapp: "",
-      pac_resp_education: "",
-      pac_resp_occupation: "",
-      pac_id: "",
+      resp_name: "",
+      resp_email: "",
+      resp_whatsapp: "",
+      resp_education: "",
+      resp_occupation: "",
+      prof_id: "",
     },
     setInitialData,
   ] = useState<PacFormData | null>(null);
 
-  const handleSelectPaciente = async (pac_id: string) => {
+  const handleSelectPaciente = async (id: string) => {
     const { data: paciente, error } = await supabase
       .from("pacientes")
       .select("*")
-      .eq("pac_id", pac_id)
+      .eq("id", id)
       .single();
 
     if (error) {
@@ -129,26 +129,26 @@ export default function ProntuariosPage() {
     // Atualiza os valores do formulário com os dados do paciente
     if (paciente) {
       const fieldsToUpdate = {
-        pac_name: paciente.pac_name || "", // Se o valor não existir, atribui uma string vazia
-        pac_sex: paciente.pac_sex || "",
-        pac_whatsapp: paciente.pac_whatsapp || "",
-        pac_cpf: paciente.pac_cpf || "",
-        pac_birth_date: paciente.pac_birth_date || "",
-        pac_email: paciente.pac_email || "",
-        pac_addrs_street_name: paciente.pac_addrs_street_name || "",
-        pac_addrs_num: paciente.pac_addrs_num || "",
-        pac_addrs_bairro: paciente.pac_addrs_bairro || "",
-        pac_addrs_city: paciente.pac_addrs_city || "",
-        pac_addrs_uf: paciente.pac_addrs_uf || "",
-        pac_addrs_zip: paciente.pac_addrs_zip || "",
-        pac_addrs_has_comp: paciente.pac_addrs_has_comp || "",
-        pac_addrs_comp: paciente.pac_addrs_comp || "",
+        name: paciente.name || "", // Se o valor não existir, atribui uma string vazia
+        sex: paciente.sex || "",
+        whatsapp: paciente.whatsapp || "",
+        cpf: paciente.cpf || "",
+        birth_date: paciente.birth_date || "",
+        email: paciente.email || "",
+        addrs_street_name: paciente.addrs_street_name || "",
+        addrs_num: paciente.addrs_num || "",
+        addrs_bairro: paciente.addrs_bairro || "",
+        addrs_city: paciente.addrs_city || "",
+        addrs_uf: paciente.addrs_uf || "",
+        addrs_zip: paciente.addrs_zip || "",
+        addrs_has_comp: paciente.addrs_has_comp || "",
+        addrs_comp: paciente.addrs_comp || "",
         pac_has_resp: paciente.pac_has_resp || "",
-        pac_resp_name: paciente.pac_resp_name || "",
-        pac_resp_email: paciente.pac_resp_email || "",
-        pac_resp_whatsapp: paciente.pac_resp_whatsapp || "",
-        pac_resp_education: paciente.pac_resp_education || "",
-        pac_resp_occupation: paciente.pac_resp_occupation || "",
+        resp_name: paciente.resp_name || "",
+        resp_email: paciente.resp_email || "",
+        resp_whatsapp: paciente.resp_whatsapp || "",
+        resp_education: paciente.resp_education || "",
+        resp_occupation: paciente.resp_occupation || "",
       };
 
       // Atualiza todos os campos do formulário
@@ -179,7 +179,7 @@ export default function ProntuariosPage() {
             <BgCard className="flex flex-col gap-4">
               <Controller
                 control={control}
-                name="pac_id"
+                name="prof_id"
                 render={({ field }) => (
                   <Select
                     label="Nome Completo"
@@ -196,11 +196,8 @@ export default function ProntuariosPage() {
                     {dataTeste
                       .filter((paciente) => !!paciente)
                       .map((paciente) => (
-                        <SelectItem
-                          key={paciente.pac_id}
-                          value={paciente.pac_id}
-                        >
-                          {loading ? "Carregando..." : paciente.pac_name}
+                        <SelectItem key={paciente.id} value={paciente.id}>
+                          {loading ? "Carregando..." : paciente.name}
                         </SelectItem>
                       ))}
                   </Select>
@@ -209,7 +206,7 @@ export default function ProntuariosPage() {
               <div className="flex gap-4">
                 <Controller
                   control={control}
-                  name="pac_birth_date"
+                  name="birth_date"
                   render={({ field }) => (
                     <DatePicker
                       className="w-3/4"
@@ -228,9 +225,9 @@ export default function ProntuariosPage() {
                   labelPlacement="outside"
                   placeholder="Idade"
                   value={
-                    getValues("pac_birth_date")
+                    getValues("birth_date")
                       ? calcularIdadePaciente(
-                          getValues("pac_birth_date")
+                          getValues("birth_date")
                         ).toString()
                       : ""
                   }
@@ -242,22 +239,22 @@ export default function ProntuariosPage() {
                 label="Sexo"
                 labelPlacement="outside"
                 placeholder="Sexo"
-                value={getValues("pac_sex") || ""}
+                value={getValues("sex") || ""}
               />
               <Input
                 isDisabled={isEditing}
                 label="Telefone"
                 labelPlacement="outside"
                 placeholder="Telefone"
-                value={initialData?.pac_whatsapp || ""}
-                {...registerWithMask("pac_whatsapp", "99 99999-9999")}
+                value={initialData?.whatsapp || ""}
+                {...registerWithMask("whatsapp", "99 99999-9999")}
               />
               <Input
                 isDisabled={isEditing}
                 label="Email"
                 labelPlacement="outside"
                 placeholder="Email"
-                value={getValues("pac_email") || ""}
+                value={getValues("email") || ""}
                 onChange={() => null}
               />
             </BgCard>
@@ -269,7 +266,7 @@ export default function ProntuariosPage() {
                 label="CEP"
                 labelPlacement="outside"
                 placeholder="CEP"
-                value={getValues("pac_addrs_zip") || ""}
+                value={getValues("addrs_zip") || ""}
                 onChange={() => null}
               />
               <div className="flex gap-4">
@@ -279,8 +276,8 @@ export default function ProntuariosPage() {
                   label="Endereço"
                   labelPlacement="outside"
                   placeholder="Endereço"
-                  value={getValues("pac_addrs_street_name") || ""}
-                  onChange={() => setValue("pac_addrs_street_name", "")}
+                  value={getValues("addrs_street_name") || ""}
+                  onChange={() => setValue("addrs_street_name", "")}
                 />
                 <Input
                   className="w-1/4"
@@ -288,7 +285,7 @@ export default function ProntuariosPage() {
                   label="Número"
                   labelPlacement="outside"
                   placeholder="Número"
-                  value={getValues("pac_addrs_num") || ""}
+                  value={getValues("addrs_num") || ""}
                   onChange={() => null}
                 />
               </div>
@@ -299,7 +296,7 @@ export default function ProntuariosPage() {
                   label="Bairro"
                   labelPlacement="outside"
                   placeholder="Bairro"
-                  value={getValues("pac_addrs_bairro") || ""}
+                  value={getValues("addrs_bairro") || ""}
                   onChange={() => null}
                 />
                 <Input
@@ -308,7 +305,7 @@ export default function ProntuariosPage() {
                   label="UF"
                   labelPlacement="outside"
                   placeholder="UF"
-                  value={getValues("pac_addrs_uf") || ""}
+                  value={getValues("addrs_uf") || ""}
                   onChange={() => null}
                 />
               </div>
@@ -321,7 +318,7 @@ export default function ProntuariosPage() {
                 label="Nome Completo"
                 labelPlacement="outside"
                 placeholder="Responsável"
-                value={getValues("pac_resp_name") || ""}
+                value={getValues("resp_name") || ""}
                 onChange={() => null}
               />
               <Input
@@ -329,7 +326,7 @@ export default function ProntuariosPage() {
                 label="Telefone"
                 labelPlacement="outside"
                 placeholder="Telefone"
-                value={getValues("pac_resp_whatsapp") || ""}
+                value={getValues("resp_whatsapp") || ""}
                 onChange={() => null}
               />
               <Input
@@ -337,7 +334,7 @@ export default function ProntuariosPage() {
                 label="Email"
                 labelPlacement="outside"
                 placeholder="Email"
-                value={getValues("pac_resp_email") || ""}
+                value={getValues("resp_email") || ""}
                 onChange={() => null}
               />
               <Input
@@ -345,7 +342,7 @@ export default function ProntuariosPage() {
                 label="Ocupação"
                 labelPlacement="outside"
                 placeholder="Ocupação"
-                value={getValues("pac_resp_occupation") || ""}
+                value={getValues("resp_occupation") || ""}
                 onChange={() => null}
               />
 
@@ -354,7 +351,7 @@ export default function ProntuariosPage() {
                 label="Educação"
                 labelPlacement="outside"
                 placeholder="Educação"
-                value={getValues("pac_resp_education") || ""}
+                value={getValues("resp_education") || ""}
                 onChange={() => null}
               />
             </BgCard>

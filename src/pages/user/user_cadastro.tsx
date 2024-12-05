@@ -5,6 +5,7 @@ import { Link } from "@nextui-org/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importa o hook useNavigate
 
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
@@ -15,8 +16,10 @@ import { CadastroModal } from "@/components/CadastroModal";
 import { supabase } from "@/supabaseClient";
 
 export default function UserCadastroPage() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); // useDisclosure para controlar o modal
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); // Inicia o hook de navegação
+
   const {
     register,
     handleSubmit,
@@ -43,8 +46,7 @@ export default function UserCadastroPage() {
     if (signUpError) {
       console.log(signUpError.message);
       setError(signUpError.message);
-      onOpen();
-
+      onOpen(); // Abre o modal em caso de erro
       return;
     }
 
@@ -53,10 +55,18 @@ export default function UserCadastroPage() {
 
     if (!userId) {
       setError("Erro ao obter o ID do usuário.");
-      onOpen();
-
+      onOpen(); // Abre o modal em caso de erro
       return;
     }
+
+    // Se tudo der certo, exibe o modal de sucesso
+    setError(null); // Limpa qualquer erro anterior
+    onOpen(); // Abre o modal de sucesso
+
+    // Redireciona o usuário para a página de home após o sucesso
+    setTimeout(() => {
+      navigate("/user/home"); // Redireciona para a página de home
+    }, 1500); // Espera 1.5 segundos antes de redirecionar para dar tempo de exibir o modal
   };
 
   return (
@@ -122,10 +132,7 @@ export default function UserCadastroPage() {
             <Link href="/login">
               <Button color="danger">Login</Button>
             </Link>
-            <Button
-              color="primary"
-              type="submit" // Envolvemos `handleSubmit` em uma função anônima
-            >
+            <Button color="primary" type="submit">
               Continuar
             </Button>
           </div>
@@ -136,13 +143,12 @@ export default function UserCadastroPage() {
           isOpen={isOpen}
           message={
             error
-              ? `Houve um problema ao fazer o cadastro:`
+              ? `Houve um problema ao fazer o cadastro: ${error}`
               : "Cadastro realizado com sucesso!"
           }
           status={error ? "error" : "success"}
           onOpenChange={onOpenChange}
         />
-        {/* <pre>{JSON.stringify(errors, null, 2)}</pre> */}
       </div>
     </DefaultLayout>
   );

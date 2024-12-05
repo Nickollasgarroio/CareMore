@@ -1,14 +1,19 @@
+/* eslint-disable no-console */
 
-const checkCEP = (event: React.FocusEvent<HTMLInputElement> | FocusEvent) => {
-  const inputEvent = event as React.FocusEvent<HTMLInputElement>;
-  const CEP = inputEvent.target.value.replace(/\D/g, "");
+export const checkCEP = (zip: string) => {
+  const CEP = zip.replace(/\D/g, "");
 
   fetch(`https://viacep.com.br/ws/${CEP}/json`, {})
     .then((response) => response.json())
     .then((data) => {
       console.log("CEP consultado com sucesso", data);
-      return data;
+
+      return {
+        rua: data.logradouro,
+        bairro: data.bairro,
+        cidade: data.localidade,
+        estado: data.uf,
+        cep: CEP,
+      };
     });
 };
-
-export default checkCEP

@@ -1,49 +1,62 @@
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "./providers/AuthProvider.tsx";
 import { Route, Routes } from "react-router-dom";
 
+import { AuthProvider } from "./providers/AuthProvider.tsx";
+
 import IndexPage from "@/pages/index";
-import ProntuariosPage from "@/pages/prontuarios";
+import ProntuariosPage from "@/pages/patient/patient_list.tsx";
 import DocsPage from "@/pages/docs";
 import PricingPage from "@/pages/pricing";
 import BlogPage from "@/pages/blog";
 import AboutPage from "@/pages/about";
-import PacEvolucaoPage from "@/pages/patient_evolucao";
-import PatientCadastro from "@/pages/patient_cadastro";
-import UserLoginPage from "@/pages/user_signin";
-import UserCadastroPage from "@/pages/user_cadastro";
-import UserProfileCreatePage from "@/pages/user_profile_create.tsx";
-import UserResetPasswordPage from "@/pages/user_resetpassword";
-import UserHomePage from "@/pages/user_home";
-import Logout from "@/pages/user_logout.tsx";
+import PatientCadastro from "@/pages/patient/patient_cadastro.tsx";
+import UserLoginPage from "@/pages/user/user_login.tsx";
+import UserCadastroPage from "@/pages/user/user_cadastro.tsx";
+import UserProfileEditPage from "@/pages/user/user_profile.tsx";
+import UserResetPasswordPage from "@/pages/user/user_reset_password.tsx";
+import UserHomePage from "@/pages/user/user_home.tsx";
+import Logout from "@/pages/user/user_logout.tsx";
+import LoadingPage from "@/pages/loading.tsx";
+import PacienteProntuario from "@/pages/patient/patient_prontuario.tsx";
+import PatientEvolucaoCreatePage from "@/pages/patient/patient_evolucao_create.tsx";
+import PatientEvolucaoListPage from "@/pages/patient/patient_evolucao_list.tsx";
+import UserUpdatePasswordPage from "@/pages/user/user_update_password.tsx";
 
 function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <Routes>
-          <Route element={<IndexPage />} path="/" />
+          <Route element={<UserHomePage />} path="/" />
+          <Route element={<IndexPage />} path="/dev_menu" />
           <Route element={<DocsPage />} path="/docs" />
           <Route element={<PricingPage />} path="/pricing" />
           <Route element={<BlogPage />} path="/blog" />
           <Route element={<AboutPage />} path="/about" />
-          <Route element={<PatientCadastro />} path="/cadastro" />
-          <Route element={<ProntuariosPage />} path="user/prontuarios" />
+          <Route element={<PatientCadastro />} path="/patient/create" />
+          <Route element={<ProntuariosPage />} path="/patient/list" />
           <Route element={<UserLoginPage />} path="/login" />
           <Route element={<UserCadastroPage />} path="/user/cadastro" />
           <Route
             element={<UserResetPasswordPage />}
             path="/user/resetpassword"
           />
-          <Route element={<UserHomePage />} path="/user/home" />
+          {/* <Route element={<UserHomePage />} path="/user/home" /> */}
           <Route
-            element={<PacEvolucaoPage />}
-            path="/user/pacientes/evolucao"
+            element={<PatientEvolucaoCreatePage />}
+            path="/patient/evolucao/create"
+          />
+          <Route
+            element={<PatientEvolucaoListPage />}
+            path="/patient/evolucao/list"
           />
           <Route element={<Logout />} path="/logout" />
+          <Route element={<UserProfileEditPage />} path="/user/profile" />
+          <Route element={<PacienteProntuario />} path="/patient/prontuario" />
+          <Route element={<LoadingPage />} path="/loading" />
           <Route
-            element={<UserProfileCreatePage />}
-            path="/user/profile/create"
+            element={<UserUpdatePasswordPage />}
+            path="/user/update_password"
           />
         </Routes>
       </AuthProvider>

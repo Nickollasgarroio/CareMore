@@ -25,7 +25,7 @@ import {
 } from "@/components/ProfileForm/steps/ProfileFormSteps";
 import { BackButton } from "@/components/BackButton";
 
-export default function UserProfileCreatePage() {
+export default function UserProfileEditPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<string>("pessoal");
@@ -175,11 +175,8 @@ export default function UserProfileCreatePage() {
 
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-        <div className="inline-block max-w-lg text-center justify-center">
-          <BackButton subtitulo="Editar" titulo="Perfil Profissional" />
-        </div>
-      </section>
+      <BackButton subtitulo="Editar" titulo="Profissional" />
+
       <div>
         <FormProvider {...methods}>
           <form
@@ -240,7 +237,7 @@ export default function UserProfileCreatePage() {
           status={error ? "error" : "success"}
           onOpenChange={onOpenChange}
         />
-        <pre>{JSON.stringify(valores, null, 2)}</pre>
+        {/* <pre>{JSON.stringify(valores, null, 2)}</pre> */}
       </div>
     </DefaultLayout>
   );

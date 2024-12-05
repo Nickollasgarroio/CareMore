@@ -1,9 +1,11 @@
 import { Spacer, Input, Button, useDisclosure } from "@nextui-org/react";
+import { useEffect } from "react";
 import { Link } from "@nextui-org/react";
-// import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom"; // Remover se estiver usando NextUI Link
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importa o hook useNavigate
 
 import DefaultLayout from "@/layouts/default";
 import { title, subtitle } from "@/components/primitives";
@@ -11,10 +13,13 @@ import { UserSignInFormSchema } from "@/schemas/cadastroUserSchema";
 import { UserLoginData } from "@/types/FormDataTypes";
 import { CadastroModal } from "@/components/CadastroModal";
 import { supabase } from "@/supabaseClient";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function UserLoginPage() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure(); //declaração para uso do hook do modal
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); // Hook de navegação
+  const { session, loading } = useAuth();
 
   const {
     register,
@@ -26,10 +31,15 @@ export default function UserLoginPage() {
     defaultValues: {},
   });
 
-  const onSubmit = () => {
-    console.log(errors);
-  };
+  // Redireciona para /home se a sessão do usuário existir e não estiver carregando
+  useEffect(() => {
+    if (!loading && session) {
+      navigate("/");
+    }
+  }, [loading, session, navigate]);
+
   const handleSignIn = async (data: UserLoginData) => {
+    setError(null);
     const { email, password } = data;
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -39,13 +49,19 @@ export default function UserLoginPage() {
     if (error) {
       console.log(error.message);
       setError(error.message);
-    } else console.log("Logado com sucesso");
-    onOpen();
+      onOpen();
+    } else {
+      console.log("Logado com sucesso");
+      onOpen(); // Abre o modal de sucesso
+      setTimeout(() => {
+        navigate("/"); // Redireciona após o sucesso do login
+      }, 1500); // Espera 1.5 segundos para o usuário ver o modal antes do redirecionamento
+    }
   };
 
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 i md:py-10 ">
+      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 ">
         <div className="inline-block max-w-lg text-center justify-center">
           <h1 className={title({ color: "blue", size: "lg" })}>
             Seja Bem-vindo(a)!

@@ -39,6 +39,11 @@ export default function IndexPage() {
               Criar Perfil
             </Button>
           </Link>
+          <Link href="/patient/evolucao">
+            <Button color="primary" size="lg">
+              Evolução
+            </Button>
+          </Link>
         </div>
       </section>
     </DefaultLayout>

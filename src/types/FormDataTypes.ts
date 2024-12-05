@@ -1,26 +1,28 @@
 // types/pacDataTypes.ts
 
 export type PacFormData = {
+  prof_id?: string;
   pac_id?: string;
-  pac_name: string;
-  pac_sex: string;
-  pac_whatsapp: string;
-  pac_cpf?: string;
-  pac_birth_date: string;
-  pac_email?: string;
-  pac_addrs_street_name: string;
-  pac_addrs_num: string;
-  pac_addrs_bairro: string;
-  pac_addrs_city: string;
-  pac_addrs_uf: string;
-  pac_addrs_zip: string;
-  pac_addrs_comp?: string;
+  name: string;
+  sex: string;
+  whatsapp: string;
+  cpf?: string;
+  birth_date: string;
+  email?: string;
+  addrs_street_name: string;
+  addrs_num: string;
+  addrs_bairro: string;
+  addrs_city: string;
+  addrs_uf: string;
+  addrs_zip: string;
+  addrs_comp?: string;
   pac_has_resp?: boolean;
-  pac_resp_name?: string;
-  pac_resp_email?: string;
-  pac_resp_whatsapp?: string;
-  pac_resp_education?: string;
-  pac_resp_occupation?: string;
+  resp_name?: string;
+  resp_email?: string;
+  resp_whatsapp?: string;
+  resp_education?: string;
+  resp_occupation?: string;
+  status?: string;
 };
 
 export type UserSignUpFormData = {
@@ -30,6 +32,12 @@ export type UserSignUpFormData = {
   password_confirmation: string;
   role?: "admin" | "user";
 };
+
+export type UserResetPasswordData = {
+  email: string;
+  password?: string;
+};
+
 export type UserProfile = {
   id: string;
   name: string;
@@ -53,4 +61,13 @@ export type UserProfile = {
 export type UserLoginData = {
   email: string;
   password: string;
+};
+
+export type EvolucaoType = {
+  id?: string;
+  pac_id: string;
+  prof_id: string;
+  queixa: string;
+  observacao: string;
+  date: string;
 };

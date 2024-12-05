@@ -5,36 +5,29 @@ import {
   FieldErrors,
   Control,
   UseFormSetValue,
-  FieldValues,
-  Path,
-  PathValue,
 } from "react-hook-form";
 
-interface CitySelectProps<T extends FieldValues> {
+import { UserProfile } from "@/types/FormDataTypes";
+
+interface CitySelectProps {
   uf: string;
-  readonly?: boolean;
-  control: Control<T>;
-  errors: FieldErrors<T>;
-  setValue: UseFormSetValue<T>;
-  name: Path<T>; // Alterado para Path<T>
-  label?: string; // Personalizar o rótulo
+  control: Control<UserProfile>;
+  errors: FieldErrors<UserProfile>;
+  setValue: UseFormSetValue<UserProfile>; // Added setValue prop
 }
 
-export function CitySelect<T extends FieldValues>({
+export function CitySelect2({
   uf,
   control,
   errors,
   setValue,
-  name,
-  readonly,
-  label = "Cidade",
-}: CitySelectProps<T>) {
+}: CitySelectProps) {
   const [cities, setCities] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!uf) return;
+    if (!uf) return; // Não fazer nada se o UF não estiver selecionado.
 
     const fetchCities = async () => {
       setLoading(true);
@@ -63,23 +56,20 @@ export function CitySelect<T extends FieldValues>({
   return (
     <Controller
       control={control}
-      name={name}
+      name="city"
       render={({ field }) => (
         <Autocomplete
           isRequired
-          isReadOnly={readonly}
-          errorMessage={errors[name]?.message?.toString() || error}
+          errorMessage={errors.city?.message || error}
           isClearable={false}
-          isInvalid={!!errors[name] || !!error}
-          label={label}
+          isInvalid={!!errors.city || !!error}
+          label="Cidade"
           labelPlacement="outside"
           placeholder={loading ? "Carregando..." : "Selecione uma cidade"}
-          defaultSelectedKey={field.value}
           selectedKey={field.value}
           onSelectionChange={(value) => {
-            setValue(name, value as PathValue<T, Path<T>>, {
-              shouldValidate: true,
-            });
+            // Use setValue to immediately update the form state
+            setValue("city", value as string, { shouldValidate: true });
           }}
         >
           {!loading && cities.length > 0 ? (
