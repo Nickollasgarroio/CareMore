@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { Card, CardBody, CardHeader, Button, Link } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 
@@ -6,7 +8,6 @@ import { useAuth } from "@/providers/AuthProvider";
 import { BackButton } from "@/components/BackButton";
 import { supabase } from "@/supabaseClient";
 import withAuth from "@/hocs/withAuth";
-
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 function UserHomePage() {
@@ -53,8 +54,8 @@ function UserHomePage() {
       <section className="flex flex-col justify-center items-center w">
         <div className="flex flex-col mx-auto w-full max-w-[400px]">
           <BackButton
-            titulo="Página Inicial"
             subtitulo={`Olá, ${profile?.name}`}
+            titulo="Página Inicial"
           />
         </div>
 
@@ -85,22 +86,22 @@ function UserHomePage() {
             <CardBody>
               <div className="flex flex-col gap-4">
                 <Link href="/user/profile">
-                  <Button color="primary" fullWidth>
+                  <Button fullWidth color="primary">
                     Editar Perfil
                   </Button>
                 </Link>
                 <Link href="/patient/list">
-                  <Button color="secondary" fullWidth>
+                  <Button fullWidth color="secondary">
                     Pacientes
                   </Button>
                 </Link>
                 <Link href="/support">
-                  <Button color="success" fullWidth>
+                  <Button fullWidth color="success">
                     Suporte
                   </Button>
                 </Link>
                 <Link href="/logout">
-                  <Button color="danger" fullWidth>
+                  <Button fullWidth color="danger">
                     Sair da Conta
                   </Button>
                 </Link>

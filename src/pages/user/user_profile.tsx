@@ -171,7 +171,6 @@ export default function UserProfileEditPage() {
         return null;
     }
   };
-  const valores = watch();
 
   return (
     <DefaultLayout>

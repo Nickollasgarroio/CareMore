@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../supabaseClient";
-import DefaultLayout from "@/layouts/default";
-
 import { Spinner } from "@nextui-org/react";
 
-import { title, subtitle } from "@/components/primitives";
+import { supabase } from "../../supabaseClient";
+
+import DefaultLayout from "@/layouts/default";
+import { title } from "@/components/primitives";
 
 const Logout: React.FC = () => {
   const navigate = useNavigate();

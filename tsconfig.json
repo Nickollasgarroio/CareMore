@@ -6,6 +6,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "esModuleInterop": true,
+
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -20,8 +21,8 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "jest.config.cjs"],

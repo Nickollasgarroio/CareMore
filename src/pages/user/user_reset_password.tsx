@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { AuthError } from "@supabase/supabase-js";
+
 import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
 import { UserResetPasswordSchema } from "@/schemas/cadastroUserSchema";
@@ -11,7 +12,6 @@ import { UserResetPasswordData } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
 import { BackButton } from "@/components/BackButton";
 import { ModalManager } from "@/components/modals/ModalManager";
-import { ErrorViewer } from "@/components/ErrorViewer";
 
 export default function UserResetPasswordPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -27,6 +27,7 @@ export default function UserResetPasswordPage() {
 
   const handleReset = async (data: UserResetPasswordData) => {
     const { email } = data;
+
     setError(null); // Reset previous error state before attempting to send the request.
     const { error } = await supabase.auth.resetPasswordForEmail(email);
 
@@ -71,10 +72,10 @@ export default function UserResetPasswordPage() {
           </Button>
         </div>
         <ModalManager
-          status={error ? "error" : "success"}
           error={error?.message}
           isOpen={isOpen}
           message="Verifique seu email para redefinir sua senha!"
+          status={error ? "error" : "success"}
           type="general"
           onOpenChange={onOpenChange}
         />
