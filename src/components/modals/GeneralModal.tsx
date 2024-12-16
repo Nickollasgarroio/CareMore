@@ -14,7 +14,7 @@ interface GeneralModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   status?: "success" | "error";
-  message?: string;
+  message?: string | null;
   error?: string;
   navigateTo?: string;
 }

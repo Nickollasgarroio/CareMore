@@ -15,7 +15,7 @@ import DefaultLayout from "@/layouts/default";
 import { UserProfileSchema } from "@/schemas/cadastroUserSchema";
 import { UserProfile } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
-import { CadastroModal } from "@/components/CadastroModal";
+import { GeneralModal } from "@/components/modals/GeneralModal";
 import { supabase } from "@/supabaseClient";
 import {
   PersonalInfoStep,
@@ -30,7 +30,7 @@ export default function UserProfileEditPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<string>("pessoal");
   const [profileId, setProfileId] = useState<string | null>(null);
-
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
   const steps = ["pessoal", "localidade", "profissional", "contato"];
   const currentStepIndex = steps.indexOf(currentPage);
   const { session, loading } = useAuth();
@@ -73,25 +73,30 @@ export default function UserProfileEditPage() {
 
         if (error) {
           console.error("Erro ao buscar perfil:", error.message);
-          // Se não encontrar perfil ou ocorrer erro, reseta o formulário com o id apenas.
           reset({ id: session.user.id });
-        } else if (data) {
-          // Se encontrar o perfil, reseta o formulário com os dados do perfil
-          reset(data);
-          setProfileId(data.id); // Armazena o ID do perfil encontrado
+          setError("error");
+          setModalMessage(
+            "Ops! Parece que você ainda não tem um perfil cadastrado conosco, por favor preencha os dados abaixo para prosseguir!"
+          );
+          onOpen(); // Abre o modal em caso de erro
+        } else if (!data) {
+          console.log("Nenhum perfil encontrado, abrindo modal...");
+          reset({ id: session.user.id });
+          setModalMessage(
+            "Ops! Parece que você ainda não tem um perfil cadastrado conosco, por favor preencha os dados abaixo para prosseguir!"
+          );
+          onOpen(); // Abre o modal quando não houver dados
         } else {
-          // Se não encontrar dados, ainda assim preenche o id do usuário no formulário
-          reset({ id: session.user.id });
+          console.log("Perfil encontrado:", data);
+          reset(data); // Reseta o formulário com os dados do perfil
+          setProfileId(data.id); // Armazena o ID do perfil encontrado
         }
       }
     };
 
     fetchUserProfile();
-  }, [session, reset]);
+  }, [session, reset, onOpen]);
 
-  useEffect(() => {
-    console.log("Erros do formulário:", errors);
-  }, [errors]);
   const onSubmitSupabase = async (data: UserProfile) => {
     if (profileId) {
       // Atualiza os dados existentes
@@ -225,14 +230,10 @@ export default function UserProfileEditPage() {
             </div>
           </form>
         </FormProvider>
-        <CadastroModal
+        <GeneralModal
           error={error ? error : ""}
           isOpen={isOpen}
-          message={
-            error
-              ? `Houve um problema ao fazer o cadastro:`
-              : "Cadastro realizado com sucesso!"
-          }
+          message={modalMessage}
           status={error ? "error" : "success"}
           onOpenChange={onOpenChange}
         />

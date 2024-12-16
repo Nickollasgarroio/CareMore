@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { Spacer, Input, Button, useDisclosure } from "@nextui-org/react";
-import { Link } from "@nextui-org/react";
+import { Link } from "react-router-dom";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,8 +12,9 @@ import { title, subtitle } from "@/components/primitives";
 import { CreateUserSchema } from "@/schemas/cadastroUserSchema";
 import { UserSignUpFormData } from "@/types/FormDataTypes";
 import { BgCard } from "@/components/bg-card";
-import { CadastroModal } from "@/components/CadastroModal";
+
 import { supabase } from "@/supabaseClient";
+import { GeneralModal } from "@/components/modals/GeneralModal";
 
 export default function UserCadastroPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure(); // useDisclosure para controlar o modal
@@ -65,7 +66,7 @@ export default function UserCadastroPage() {
 
     // Redireciona o usuário para a página de home após o sucesso
     setTimeout(() => {
-      navigate("/user/home"); // Redireciona para a página de home
+      navigate("/login"); // Redireciona para a página de home
     }, 1500); // Espera 1.5 segundos antes de redirecionar para dar tempo de exibir o modal
   };
 
@@ -129,7 +130,7 @@ export default function UserCadastroPage() {
           </BgCard>
           <Spacer />
           <div className="flex flex-row gap-4 mx-auto">
-            <Link href="/login">
+            <Link to="/login">
               <Button color="danger">Login</Button>
             </Link>
             <Button color="primary" type="submit">
@@ -138,17 +139,7 @@ export default function UserCadastroPage() {
           </div>
         </form>
 
-        <CadastroModal
-          error={error ? error : ""}
-          isOpen={isOpen}
-          message={
-            error
-              ? `Houve um problema ao fazer o cadastro: ${error}`
-              : "Cadastro realizado com sucesso!"
-          }
-          status={error ? "error" : "success"}
-          onOpenChange={onOpenChange}
-        />
+        <GeneralModal isOpen={isOpen} onOpenChange={onOpenChange} />
       </div>
     </DefaultLayout>
   );

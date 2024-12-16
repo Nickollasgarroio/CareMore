@@ -88,10 +88,10 @@ export default function PatientEvolucaoCreatePage() {
   return paciente && session ? (
     <DefaultLayout>
       <BackButton subtitulo="Nova Evolução" titulo="Evolução" />
-      <Card className="w-[90%] max-w-[600px] mx-auto">
+      <Card className="w-[90%] max-w-[600px] mx-auto max-sm:w-[100%]">
         <CardBody>
           <form
-            className="flex flex-col gap-4 w-[90%] max-w-[600px] mx-auto"
+            className="flex flex-col gap-4 w-[100%] max-w-[600px] mx-auto"
             onSubmit={handleSubmit(onSubmitSupabase)}
           >
             <Spacer y={2} />

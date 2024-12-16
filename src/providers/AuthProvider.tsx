@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import {
   createContext,
   useContext,
@@ -9,20 +8,18 @@ import {
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabaseClient";
 
-// Define a type for the profile data
 type ProfileType = {
   id: string;
   name: string;
   last_name: string;
   area_de_atuacao: string;
   email: string;
-  // Adicione outros campos conforme necessário
 };
 
 type AuthContextType = {
   session: Session | null;
   loading: boolean;
-  profile: ProfileType | null; // Add profile to the context type
+  profile: ProfileType | null;
 };
 
 type AuthProviderProps = {
@@ -32,21 +29,23 @@ type AuthProviderProps = {
 const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
-  profile: null, // Initialize profile as null
+  profile: null,
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<Session | null>(() => {
+    const storedSession = localStorage.getItem("session");
+    return storedSession ? JSON.parse(storedSession) : null;
+  });
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<ProfileType | null>(null); // State for profile data
+  const [profile, setProfile] = useState<ProfileType | null>(null);
 
   useEffect(() => {
     const fetchSessionAndProfile = async () => {
+      setLoading(true);
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
-
       if (data.session) {
-        // Fetch profile data if session is valid
         const { data: profileData, error } = await supabase
           .from("profiles")
           .select("*")
@@ -54,10 +53,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           .single();
 
         if (!error && profileData) {
-          setProfile(profileData); // Set profile data in state
+          setProfile(profileData);
         }
       }
-
       setLoading(false);
     };
 
@@ -65,10 +63,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_, session) => {
+        setLoading(true);
         setSession(session);
-
+        localStorage.setItem("session", JSON.stringify(session));
         if (session) {
-          // Fetch profile data if session is valid
           const { data: profileData, error } = await supabase
             .from("profiles")
             .select("*")
@@ -76,14 +74,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             .single();
 
           if (!error && profileData) {
-            setProfile(profileData); // Update profile state
+            setProfile(profileData);
           } else {
             setProfile(null);
           }
         } else {
           setProfile(null);
         }
-
         setLoading(false);
       }
     );
@@ -92,6 +89,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!session) {
+      localStorage.removeItem("session");
+    }
+  }, [session]);
 
   return (
     <AuthContext.Provider value={{ session, loading, profile }}>

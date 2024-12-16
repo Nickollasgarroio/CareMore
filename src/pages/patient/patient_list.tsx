@@ -52,7 +52,7 @@ function UserListaPacientes() {
         <BackButton subtitulo="Ver prontuarios" titulo="Prontuarios" />
       </section>
 
-      <div className="flex flex-col w-full max-w-[600px] mx-auto gap-4">
+      <div className="flex flex-col w-full max-w-[600px] mx-auto gap-4 ">
         <Button
           className="w-fit mx-auto"
           color="primary"

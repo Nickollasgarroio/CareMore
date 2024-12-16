@@ -157,11 +157,11 @@ function PacienteProntuario() {
       <section className="flex flex-col max-w-[400px] mx-auto">
         <BackButton subtitulo="Ver prontuarios" titulo="Prontuarios" />
       </section>
-      <div className="w-[90%] max-w-[600px] mx-auto">
+      <div className="w-[90%] max-w-[600px] mx-auto max-sm:w-[100%]">
         <Card className="p-4">
           <FormProvider {...methods}>
             <form noValidate onSubmit={handleSubmit(onSubmitSupabase)}>
-              <div className="flex flex-col my-4">
+              <div className="flex flex-col my-4 ">
                 <h1 className="text-2xl font-bold text-center">
                   {paciente?.name}
                 </h1>

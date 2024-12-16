@@ -1,6 +1,7 @@
 import { Spacer, Input, Button, useDisclosure } from "@nextui-org/react";
 import { useEffect } from "react";
-import { Link } from "@nextui-org/react";
+import { Link } from "react-router-dom";
+
 // import { Link } from "react-router-dom"; // Remover se estiver usando NextUI Link
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,18 +95,25 @@ export default function UserLoginPage() {
           />
           <Spacer />
           <div className="flex flex-row gap-4 mx-auto">
-            <Link href={"/user/cadastro"}>
+            <Link to={"/user/cadastro"}>
               <Button color="primary" variant="ghost">
                 Cadastro
               </Button>
             </Link>
+
             <Button color="primary" type="submit">
               Login
             </Button>
           </div>
           <div className="flex flex-row gap-4 mx-auto">
             <p>Esqueceu sua senha?</p>
-            <Link href={"/user/resetpassword"}>Redefinir Senha</Link>
+
+            <Link
+              to={"/user/resetpassword"}
+              className="transition duration-300 ease-in-out text-primary hover:cursor-pointer hover:underline hover:text-primary-400"
+            >
+              Redefinir Senha
+            </Link>
           </div>
         </div>
         <CadastroModal
