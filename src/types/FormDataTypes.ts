@@ -38,6 +38,11 @@ export type UserResetPasswordData = {
   password?: string;
 };
 
+export type UserUpdatePasswordData = {
+  email?: string;
+  password?: string;
+};
+
 export type UserProfile = {
   id: string;
   name: string;

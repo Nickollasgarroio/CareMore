@@ -14,7 +14,7 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { Logo } from "@/components/icons";
+import { Logo, Logotipo_var2 } from "@/components/icons";
 
 export const Navbar = () => {
   return (
@@ -22,12 +22,13 @@ export const Navbar = () => {
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand className="gap-3 max-w-fit">
           <Link
-            className="flex justify-start items-center gap-1"
+            className="flex justify-start items-center gap-2 font"
             color="foreground"
             href="/"
           >
-            <Logo />
-            <p className="font-bold text-inherit">MedSafe</p>
+            <Logo size={30} />
+            <Logotipo_var2 size={80} />
+            {/* <p className="font-bold text-inherit">CareMore</p> */}
           </Link>
         </NavbarBrand>
         <div className="hidden lg:flex gap-4 justify-start ml-2">
@@ -48,13 +49,13 @@ export const Navbar = () => {
         </div>
       </NavbarContent>
 
-      <NavbarContent className=" basis-1 pl-4" justify="end">
+      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
         <ThemeSwitch />
         <NavbarMenuToggle />
       </NavbarContent>
 
       <NavbarMenu>
-        <div className="mx-4 mt-2 flex flex-col gap-2">
+        <div className="hidden mx-4 mt-2 flex flex-col gap-2">
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link

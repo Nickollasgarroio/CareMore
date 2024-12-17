@@ -1,20 +1,31 @@
-import { Spacer, Input, Button, useDisclosure } from "@nextui-org/react";
+import {
+  Spacer,
+  Input,
+  Button,
+  useDisclosure,
+  Card,
+  CardBody,
+} from "@nextui-org/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthError } from "@supabase/supabase-js";
+
 import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
 import { UserResetPasswordSchema } from "@/schemas/cadastroUserSchema";
 import { UserResetPasswordData } from "@/types/FormDataTypes";
-import { BgCard } from "@/components/bg-card";
-import { BackButton } from "@/components/BackButton";
 import { ModalManager } from "@/components/modals/ModalManager";
-import { ErrorViewer } from "@/components/ErrorViewer";
+import { BackButton } from "@/components/BackButton";
 
 export default function UserUpdatePasswordPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<AuthError | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation(); // Para pegar os parâmetros da URL
+
   const {
     register,
     handleSubmit,
@@ -24,13 +35,51 @@ export default function UserUpdatePasswordPage() {
     mode: "onChange",
   });
 
+  // Pegar o parâmetro `token` da URL (o token é passado no magic link)
+  const searchParams = new URLSearchParams(location.search);
+  const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (token) {
+      // Tenta autenticar automaticamente com o token recebido
+      const setSessionData = async () => {
+        const { error } = await supabase.auth.setSession({
+          access_token: token,
+          refresh_token: token, // Caso o refresh token também venha junto, use-o aqui
+        });
+
+        if (error) {
+          console.error("Erro ao configurar sessão:", error.message);
+        } else {
+          console.log("Sessão configurada com sucesso!");
+        }
+      };
+
+      setSessionData();
+    }
+  }, [token]);
+
   const handleUpdate = async (data: UserResetPasswordData) => {
-    const { password } = data;
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error) {
-      setError(error);
-    } else {
+    setIsLoading(true);
+
+    try {
+      const { password } = data;
+
+      // Atualiza a senha do usuário
+      const { error } = await supabase.auth.updateUser({ password });
+
+      setIsLoading(false);
+
+      if (error) {
+        setError(error);
+        return;
+      }
+
       onOpen();
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+      setIsLoading(false);
     }
   };
 
@@ -43,36 +92,52 @@ export default function UserUpdatePasswordPage() {
         className="flex flex-col gap-4 max-w-[400px] mx-auto"
         onSubmit={handleSubmit(handleUpdate)}
       >
-        <p>Insira sua nova senha!</p>
-        <BgCard className="flex flex-col gap-4 max-w-[400px]">
-          <Input
-            isRequired
-            errorMessage={errors.password?.message}
-            isInvalid={!!errors.password}
-            label="Nova Senha"
-            labelPlacement="outside"
-            type="password"
-            {...register("password")}
-          />
-        </BgCard>
+        <Card>
+          <CardBody className="flex flex-col gap-4 p-6">
+            <Input
+              isRequired
+              errorMessage={errors.email?.message}
+              isInvalid={!!errors.email}
+              label="Email"
+              labelPlacement="outside"
+              placeholder="julia@teste.com"
+              type="email"
+              {...register("email")}
+            />
+            <Input
+              isRequired
+              description="Insira aqui sua nova senha"
+              errorMessage={errors.password?.message}
+              isInvalid={!!errors.password}
+              label="Nova Senha"
+              labelPlacement="outside"
+              placeholder="senhasupersegura123"
+              type="password"
+              {...register("password")}
+            />
+          </CardBody>
+        </Card>
         <Spacer />
         <div className="flex flex-row gap-4 mx-auto">
-          <Button color="danger" variant="bordered">
+          <Button
+            color="danger"
+            variant="bordered"
+            onClick={() => navigate("/login")}
+          >
             Voltar
           </Button>
-          <Button color="primary" type="submit">
-            Atualizar
+          <Button color="primary" isDisabled={isLoading} type="submit">
+            {isLoading ? "Atualizando..." : "Atualizar"}
           </Button>
         </div>
         <ModalManager
-          status={error ? "error" : "success"}
           error={error?.message}
           isOpen={isOpen}
           message="Senha atualizada com sucesso!"
+          status={error ? "error" : "success"}
           type="general"
           onOpenChange={onOpenChange}
         />
-        <ErrorViewer errors={errors} />
       </form>
     </DefaultLayout>
   );

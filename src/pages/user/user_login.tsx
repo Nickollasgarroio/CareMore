@@ -16,6 +16,8 @@ import { CadastroModal } from "@/components/CadastroModal";
 import { supabase } from "@/supabaseClient";
 import { useAuth } from "@/providers/AuthProvider";
 
+import { Logo } from "@/components/icons";
+
 export default function UserLoginPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +65,7 @@ export default function UserLoginPage() {
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10 ">
+        <Logo size={100} />
         <div className="inline-block max-w-lg text-center justify-center">
           <h1 className={title({ color: "blue", size: "lg" })}>
             Seja Bem-vindo(a)!
@@ -109,7 +112,7 @@ export default function UserLoginPage() {
             <p>Esqueceu sua senha?</p>
 
             <Link
-              to={"/user/resetpassword"}
+              to={"/user/reset-password"}
               className="transition duration-300 ease-in-out text-primary hover:cursor-pointer hover:underline hover:text-primary-400"
             >
               Redefinir Senha

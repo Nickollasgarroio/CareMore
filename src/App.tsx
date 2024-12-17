@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 import { AuthProvider } from "./providers/AuthProvider.tsx";
 
-import IndexPage from "@/pages/index";
+import DevMenu from "@/pages/dev_menu";
 import ProntuariosPage from "@/pages/patient/patient_list.tsx";
 import DocsPage from "@/pages/docs";
 import PricingPage from "@/pages/pricing";
@@ -28,7 +28,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route element={<UserHomePage />} path="/" />
-          <Route element={<IndexPage />} path="/dev_menu" />
+          <Route element={<DevMenu />} path="/dev_menu" />
           <Route element={<DocsPage />} path="/docs" />
           <Route element={<PricingPage />} path="/pricing" />
           <Route element={<BlogPage />} path="/blog" />
@@ -39,7 +39,7 @@ function App() {
           <Route element={<UserCadastroPage />} path="/user/cadastro" />
           <Route
             element={<UserResetPasswordPage />}
-            path="/user/resetpassword"
+            path="/user/reset-password"
           />
           {/* <Route element={<UserHomePage />} path="/user/home" /> */}
           <Route
@@ -56,7 +56,7 @@ function App() {
           <Route element={<LoadingPage />} path="/loading" />
           <Route
             element={<UserUpdatePasswordPage />}
-            path="/user/update_password"
+            path="/user/update-password"
           />
         </Routes>
       </AuthProvider>

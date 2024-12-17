@@ -13,10 +13,10 @@ function withAuth<T extends object>(WrappedComponent: React.ComponentType<T>) {
       return <LoadingSpinner />;
     }
 
-    // Redireciona para a página de login se o usuário não estiver autenticado
     if (!session) {
       return <Navigate to="/login" replace />;
     }
+    // Redireciona para a página de login se o usuário não estiver autenticado
 
     // Renderiza o componente protegido
     return <WrappedComponent {...props} />;

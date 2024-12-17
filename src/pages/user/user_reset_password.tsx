@@ -9,13 +9,14 @@ import { supabase } from "@/supabaseClient";
 import DefaultLayout from "@/layouts/default";
 import { UserResetPasswordSchema } from "@/schemas/cadastroUserSchema";
 import { UserResetPasswordData } from "@/types/FormDataTypes";
-import { BgCard } from "@/components/bg-card";
-import { BackButton } from "@/components/BackButton";
 import { ModalManager } from "@/components/modals/ModalManager";
+import { BackButton } from "@/components/BackButton";
 
 export default function UserResetPasswordPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [error, setError] = useState<AuthError | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -26,15 +27,24 @@ export default function UserResetPasswordPage() {
   });
 
   const handleReset = async (data: UserResetPasswordData) => {
+    setIsLoading(true);
     const { email } = data;
 
-    setError(null); // Reset previous error state before attempting to send the request.
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (!email) {
+      setError({ message: "O campo de e-mail é obrigatório." } as AuthError);
+      setIsLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:5173/#/user/update-password", // Redirecionamento para a página de atualização
+    });
+    setIsLoading(false);
 
     if (error) {
-      setError(error); // Set error if any occurs.
+      setError(error);
     } else {
-      onOpen(); // Open success modal when the email is successfully sent.
+      onOpen();
     }
   };
 
@@ -48,18 +58,16 @@ export default function UserResetPasswordPage() {
         onSubmit={handleSubmit(handleReset)}
       >
         <p>Insira o email cadastrado para redefinir sua senha!</p>
-        <BgCard className="flex flex-col gap-4 max-w-[400px]">
-          <Input
-            isRequired
-            errorMessage={errors.email?.message}
-            isInvalid={!!errors.email}
-            label="Email"
-            labelPlacement="outside"
-            placeholder="julia@teste.com"
-            type="email"
-            {...register("email")}
-          />
-        </BgCard>
+        <Input
+          isRequired
+          errorMessage={errors.email?.message}
+          isInvalid={!!errors.email}
+          label="Email"
+          labelPlacement="outside"
+          placeholder="julia@teste.com"
+          type="email"
+          {...register("email")}
+        />
         <Spacer />
         <div className="flex flex-row gap-4 mx-auto">
           <Link to="/login">
@@ -67,8 +75,8 @@ export default function UserResetPasswordPage() {
               Voltar
             </Button>
           </Link>
-          <Button color="primary" type="submit">
-            Enviar
+          <Button color="primary" type="submit" isDisabled={isLoading}>
+            {isLoading ? "Enviando..." : "Enviar"}
           </Button>
         </div>
         <ModalManager
@@ -79,7 +87,6 @@ export default function UserResetPasswordPage() {
           type="general"
           onOpenChange={onOpenChange}
         />
-        {/* <ErrorViewer errors={errors} /> */}
       </form>
     </DefaultLayout>
   );

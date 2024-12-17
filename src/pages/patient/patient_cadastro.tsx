@@ -9,15 +9,14 @@ import {
   useDisclosure,
   Card,
   CardBody,
-  Divider,
   Switch,
-  CardHeader,
 } from "@nextui-org/react";
 import { useForm, Controller } from "react-hook-form";
 import { Input } from "@nextui-org/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateValue, getLocalTimeZone, today } from "@internationalized/date";
 import { useHookFormMask } from "use-mask-input";
+import { useNavigate } from "react-router-dom";
 
 import { PacFormData } from "@/types/FormDataTypes";
 import { estadosUF, generos } from "@/config/cadastroConfigs";
@@ -27,12 +26,8 @@ import withAuth from "@/hocs/withAuth";
 import DefaultLayout from "@/layouts/default";
 import { CadastroModal } from "@/components/CadastroModal";
 import { useAuth } from "@/providers/AuthProvider";
-import { useNavigate } from "react-router-dom";
-
 import { CitySelect } from "@/components/ProfileForm/citySelect";
-
 import { BackButton } from "@/components/BackButton";
-
 import { ErrorViewer } from "@/components/ErrorViewer";
 
 function PatientCadastro() {
@@ -125,7 +120,7 @@ function PatientCadastro() {
   return (
     <DefaultLayout>
       <section className="flex flex-col">
-        <BackButton titulo="Cadastro" subtitulo="Novo Paciente" />
+        <BackButton subtitulo="Novo Paciente" titulo="Cadastro" />
       </section>
       <form noValidate onSubmit={handleSubmit(onSubmitSupabase)}>
         <div className="max-w-[600px] mx-auto flex flex-col gap-4">
@@ -306,11 +301,11 @@ function PatientCadastro() {
                   name="addrs_city"
                   render={({ field }) => (
                     <CitySelect
-                      name="addrs_city"
-                      uf={values.addrs_uf}
                       control={control}
                       errors={errors}
+                      name="addrs_city"
                       setValue={setValue}
+                      uf={values.addrs_uf}
                     />
                   )}
                 />

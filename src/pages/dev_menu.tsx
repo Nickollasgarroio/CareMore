@@ -4,7 +4,7 @@ import { title } from "@/components/primitives";
 import DefaultLayout from "@/layouts/default";
 import { useNavigate } from "react-router-dom";
 
-export default function IndexPage() {
+export default function DevMenu() {
   const navigate = useNavigate();
 
   return (
@@ -62,6 +62,13 @@ export default function IndexPage() {
             onClick={() => navigate("/patient/list")}
           >
             Evolução
+          </Button>
+          <Button
+            color="primary"
+            size="lg"
+            onClick={() => navigate("/user/update_password")}
+          >
+            Update Password
           </Button>
         </div>
       </section>

@@ -10,16 +10,121 @@ export const Logo: React.FC<IconSvgProps> = ({
   <svg
     fill="none"
     height={size || height}
-    viewBox="0 0 32 32"
+    viewBox="0 0 110.63 88.31"
     width={size || height}
     {...props}
   >
     <path
-      clipRule="evenodd"
-      d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-      fill="currentColor"
-      fillRule="evenodd"
+      className="cls-1"
+      d="M73.25,19.44c-1.93-8.45-9.52-17.94-17.94-17.94s-16,9.49-17.94,17.94c-2.9,12.69,5.67,22.32,17.94,27.75,12.27-5.43,20.84-15.06,17.94-27.75ZM55.31,41.01c-5.68,0-10.29-4.61-10.29-10.29s4.61,3.2,10.29,3.2,10.29-8.89,10.29-3.2-4.61,10.29-10.29,10.29Z"
+      stroke="#27aae1"
+      strokeMiterlimit="10"
+      strokeWidth="3px"
     />
+    <path
+      className="cls-1"
+      d="M19.44,15.06C12.96,13.09,1.31,23.15,1.5,33c.17,8.79,9.75,16.06,17.94,17.94,3.41.78,7.04,1.18,10.76,1.23-6.52-20.33-3.85-35-10.76-37.11Z"
+      stroke="#27aae1"
+      strokeMiterlimit="10"
+      strokeWidth="3px"
+    />
+    <path
+      className="cls-1"
+      d="M91.19,15.06c-6.91,2.1-4.23,16.77-10.76,37.11,3.72-.05,7.35-.45,10.76-1.23,8.18-1.87,17.77-9.14,17.94-17.94.21-10.68-11.66-19.85-17.94-17.94Z"
+      stroke="#27aae1"
+      strokeMiterlimit="10"
+      strokeWidth="3px"
+    />
+    <path
+      className="cls-1"
+      d="M55.31,47.19c-7.58,3.35-16.56,5.1-25.12,4.99,1.68,5.23,3.96,10.84,7.18,16.7,4.12,7.5,10.01,17.94,17.94,17.94s13.82-10.43,17.94-17.94c3.22-5.87,5.5-11.47,7.18-16.7-8.56.12-17.54-1.63-25.12-4.99Z"
+      stroke="#27aae1"
+      strokeMiterlimit="10"
+      strokeWidth="3px"
+    />
+  </svg>
+);
+
+export const Logotipo_var1: React.FC<IconSvgProps> = ({
+  size = 126.09,
+  height,
+  ...props
+}) => (
+  <svg
+    fill="none"
+    height={size || height}
+    viewBox="0 0 126.09 106.24"
+    width={size || height}
+    {...props}
+  >
+    <text
+      transform="translate(0 42.84)"
+      fontSize="50.07px"
+      fontFamily="RobotoFlex-Regular, 'Roboto Flex'"
+      fontWeight="400"
+      fontVariant="'opsz' 14, 'wght' 400, 'GRAD' 0, 'wdth' 100, 'slnt' 0, 'XOPQ' 96, 'YOPQ' 79, 'XTRA' 468, 'YTUC' 712, 'YTLC' 514, 'YTAS' 750, 'YTDE' -203, 'YTFI' 738"
+    >
+      <tspan
+        x="0"
+        y="0"
+        fill="#231f20"
+        fontFamily="RobotoFlex-Regular, 'Roboto Flex'"
+      >
+        Care
+      </tspan>
+
+      <tspan
+        x="0"
+        y="48.73"
+        fill="#27aae1"
+        fontFamily="RobotoFlex-Black, 'Roboto Flex'"
+        fontWeight="900"
+        fontVariant="'opsz' 14, 'wght' 900, 'GRAD' 0, 'wdth' 100, 'slnt' 0, 'XOPQ' 96, 'YOPQ' 79, 'XTRA' 468, 'YTUC' 712, 'YTLC' 514, 'YTAS' 750, 'YTDE' -203, 'YTFI' 738"
+      >
+        More
+      </tspan>
+    </text>
+  </svg>
+);
+
+export const Logotipo_var2: React.FC<IconSvgProps> = ({
+  size = 229.61,
+  height,
+  ...props
+}) => (
+  <svg
+    fill="none"
+    height={size || height}
+    viewBox="0 0 229.61 57.51"
+    width={size || height}
+    {...props}
+  >
+    <text
+      transform="translate(0 42.84)"
+      fontSize="50.07px"
+      fontFamily="RobotoFlex-Regular, 'Roboto Flex'"
+      fontWeight="400"
+      fontVariant="'opsz' 14, 'wght' 400, 'GRAD' 0, 'wdth' 100, 'slnt' 0, 'XOPQ' 96, 'YOPQ' 79, 'XTRA' 468, 'YTUC' 712, 'YTLC' 514, 'YTAS' 750, 'YTDE' -203, 'YTFI' 738"
+    >
+      <tspan
+        x="0"
+        y="0"
+        fill="#231f20"
+        fontFamily="RobotoFlex-Regular, 'Roboto Flex'"
+      >
+        Care
+      </tspan>
+
+      <tspan
+        x="103.52"
+        y="0"
+        fill="#27aae1"
+        fontFamily="RobotoFlex-Black, 'Roboto Flex'"
+        fontWeight="900"
+      >
+        More
+      </tspan>
+    </text>
   </svg>
 );
 
